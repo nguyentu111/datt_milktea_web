@@ -1,0 +1,1 @@
+<img src="{{ $state }}" width="50px">

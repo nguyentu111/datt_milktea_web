@@ -1,3 +1,21 @@
+{{-- <!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
+        <link rel="icon" href="{{ asset('assets/images/bewama-logo.png') }}" type="image/x-icon"/>
+
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <title>Warehouse Management</title>
+    </head>
+    <body>
+        {{ $slot }}
+    </body>
+</html> --}}
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
@@ -10,15 +28,38 @@
         <!-- Fonts -->
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
 
-        <!-- Styles -->
-        <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-
         <!-- Scripts -->
-        <script src="{{ asset('js/app.js') }}" defer></script>
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <script>
+            if (localStorage.getItem('dark-mode') === 'false' || !('dark-mode' in localStorage)) {
+                document.querySelector('html').classList.remove('dark');
+                document.querySelector('html').style.colorScheme = 'light';
+            } else {
+                document.querySelector('html').classList.add('dark');
+                document.querySelector('html').style.colorScheme = 'dark';
+            }
+        </script>          
     </head>
-    <body>
-        <div class="font-sans text-gray-900 antialiased">
-            {{ $slot }}
-        </div>
+    <body class="font-inter antialiased bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400">
+
+        <main class="bg-white">
+
+            <!-- Content -->
+            <div class="w-full">
+
+                <div class="min-h-screen h-full">
+
+                    <div class="w-full max-w-3xl mx-auto px-4 py-8">
+                        {{ $slot }}
+                    </div>
+
+                </div>
+
+            </div>
+
+            </div>
+
+        </main>        
     </body>
 </html>
+
