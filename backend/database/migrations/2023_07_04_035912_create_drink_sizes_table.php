@@ -16,11 +16,11 @@ class CreateDrinkSizesTable extends Migration
         Schema::create('drink_sizes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('drink_id');
-            $table->foreign('drink_id')->references('id')->on('drinks');
+            $table->foreign('drink_id')->references('id')->on('products');
             $table->unsignedBigInteger('size_id');
             $table->foreign('size_id')->references('id')->on('sizes');
             $table->tinyInteger('active');
-            $table->decimal('price_increase',15,2);
+            $table->decimal('price_up_percent',4,2);
             $table->timestamps();
         });
     }

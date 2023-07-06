@@ -19,11 +19,9 @@ class CreateStaffsTable extends Migration
             $table->string('last_name',50);
             $table->string('phone',14);
             $table->string('picture')->nullable();
-            $table->tinyInteger('gender');
+            $table->enum('gender',['male','female']);
             $table->date('dob');
             $table->tinyInteger('active');
-            $table->string('email')->unique();
-            $table->string('password')->unique();
             $table->unsignedBigInteger('branch_id');
             $table->foreign('branch_id')->references('id')->on('branches');
             $table->timestamps();

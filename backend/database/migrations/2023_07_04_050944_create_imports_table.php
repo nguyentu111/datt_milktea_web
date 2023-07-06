@@ -15,11 +15,14 @@ class CreateImportsTable extends Migration
     {
         Schema::create('imports', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('supply_detail_id');
-            $table->foreign('supply_detail_id')->references('id')->on('supply_details');
+            $table->unsignedBigInteger('supplier_id')->nullable();
+            $table->foreign('supplier_id')->references('id')->on('suppliers');
             $table->unsignedBigInteger('staff_id');
             $table->foreign('staff_id')->references('id')->on('staffs');
-            $table->decimal('amount',10,4);
+            $table->unsignedBigInteger('branch_source_id')->nullable();
+            $table->foreign('branch_source_id')->references('id')->on('branches');
+            $table->unsignedBigInteger('branch_des_id');
+            $table->foreign('branch_des_id')->references('id')->on('branches');
             $table->timestamps();
         });
     }

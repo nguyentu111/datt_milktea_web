@@ -14,12 +14,13 @@ class CreateOrderDetailsTable extends Migration
     public function up()
     {
         Schema::create('order_details', function (Blueprint $table) {
+            $table->id();
             $table->unsignedBigInteger('drink_size_id');
             $table->foreign('drink_size_id')->references('id')->on('drink_sizes');
             $table->unsignedBigInteger('order_id');
             $table->foreign('order_id')->references('id')->on('orders');
-            $table->json('topping_list')->nullable();
-            $table->decimal('total_price',15,2);
+            $table->decimal('regular_price',15,2);
+            $table->decimal('promotion_price',15,2)->nullable();
             $table->timestamps();
         });
     }

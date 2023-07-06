@@ -19,8 +19,6 @@ class CreateCustomersTable extends Migration
             $table->string('first_name',50);
             $table->string('last_name',50);
             $table->string('phone',14)->unique();
-            $table->string('email',255);
-            $table->string('password');
             $table->rememberToken();
             $table->timestamps();
         });
@@ -33,6 +31,6 @@ class CreateCustomersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('all');
+        Schema::dropIfExists('customers');
     }
 }

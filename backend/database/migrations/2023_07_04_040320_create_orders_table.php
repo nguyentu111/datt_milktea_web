@@ -18,15 +18,18 @@ class CreateOrdersTable extends Migration
 
             $table->unsignedBigInteger('customer_id');
             $table->foreign('customer_id')->references('id')->on('customers');
-            $table->unsignedBigInteger('cheff_id');
+            $table->unsignedBigInteger('cheff_id')->nullable();
             $table->foreign('cheff_id')->references('id')->on('staffs');
+            $table->unsignedBigInteger('branch_id');
+            $table->foreign('branch_id')->references('id')->on('branches');
             $table->enum('status',['canceled','shipping','wait_for_shiping','success','processing','pending']);
             $table->timestamp('shipped_at')->nullable();
-            $table->enum('payment_type',['cash','momo','zalo']);
-            $table->string('bill_url');
-            $table->decimal('ship_price',15,2);
-            $table->decimal('total_price',15,2);
-            $table->decimal('final_price',15,2);
+            $table->string('ship_to')->nullable();
+            $table->decimal('ship_amount',15,2)->nullable();
+            $table->decimal('tax_amount',15,2);
+            $table->decimal('total_amount',15,2);
+            $table->enum('payment_type',['cash','momo','zalopay']);
+            $table->tinyInteger('is_paid');
             $table->timestamps();
         });
     }

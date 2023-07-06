@@ -15,7 +15,7 @@ class CreateBranchMaterialsTable extends Migration
     {
         Schema::create('branch_materials', function (Blueprint $table) {
             $table->unsignedBigInteger('material_id');
-            $table->foreign('material_id')->references('id')->on('materials');
+            $table->foreign('material_id')->references('id')->on('products');
             $table->unsignedBigInteger('branch_id');
             $table->foreign('branch_id')->references('id')->on('branches');
             $table->decimal('amount',10,4);

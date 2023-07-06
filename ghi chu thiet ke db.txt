@@ -1,0 +1,27 @@
+- có nên tạo 1 bảng provider ?
+- nên xử lí phần hàng tồn kho như thế nào?
+-nên xử lí phần giao đơn hàng cho đơn vị vận chuyển ntn? 
+- phần import_details nên làm theo trường hợp nào (1. nếu mà provider không đủ nguyên liệu thì chỉ giao những nguyên liệu có thể giao, (và chỉ giao đủ số lượng có thể giao ?) 
+2. nếu ko đủ tất cả nguyên liệu trong 1 đơn nhập hàng thì hủy cả đơn.)
+
+- tất cả khách hàng offline ko chia sẻ sdt thì sẽ xài chung 1 tài khoản vãng lai trong bảng customer
+- khách hàng đạt offline có thể chia sẻ sdt cho nhân viên quầy để lưu đơn hàng vào tài khoản.
+- làm nhiều nhà cung cấp, nhiều kho, nhiều chi nhánh
+- xuất hàng sang kho khác thì ko quản lí satus, chỉ cần cộng trừ số lượng nguyên liệu trực tiếp khi nhập xuất
+
+- khách hàng có thể lưu đơn hàng dạng nháp và lưu vào db (trạng thái là pending),khi ấn xác nhận mới chuyển cho đầu bếp làm (trạng thái đã đặt), nhưng chỉ cần lưu dạng nháp trong frontend là đc ? bởi vì không cần đăng nhập cũng có thể lưu vào giỏ hàng đc
+- mỗi phiếu yêu cầu cung cấp có nhiều phiếu nhập, vậy mỗi chi tiết phiếu cung cấp sẽ có 1 field id nhà cung cấp ? 
+- giá ship giờ làm như thế nào ? random?
+
+
+- gộp 3 bảng topping, material, drinks thành 1 bảng product, thêm 1 bảng type products
+- drink size price inscrease sửa thành discount
+- provider => supplier
+- gộp nhập xuất thành 1 bảng import và import detail.
+- sale => promotion, promotion_drinks thêm cột discount nullable, sale_price nullable
+- tạo bảng user, xóa password customer & staff, 1 user có nhiều role
+
+
+-h đã có 2 bảng product import price với export price rồi thì có cần bỏ id của nó vào các bảng import detail với order detail ko.
+
+

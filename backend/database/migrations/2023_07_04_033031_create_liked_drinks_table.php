@@ -15,7 +15,7 @@ class CreateLikedDrinksTable extends Migration
     {
         Schema::create('liked_drinks', function (Blueprint $table) {
             $table->unsignedBigInteger('drink_id');
-            $table->foreign('drink_id')->references('id')->on('drinks');
+            $table->foreign('drink_id')->references('id')->on('products');
             $table->unsignedBigInteger('customer_id');
             $table->foreign('customer_id')->references('id')->on('customers');
             $table->timestamps();
