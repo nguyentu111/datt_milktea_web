@@ -2,12 +2,11 @@ import { useState } from "react";
 import UserSideBar from "../patials/UserSidebar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
-import AddressModel from "../components/shared/AddressModal";
 import BreadCrumb from "../components/shared/BreadCrumb";
+import AddAddress from "../components/shared/AddAddress";
 
 export default function Account() {
   const [tab, setTab] = useState(1);
-  const [openAdressModel, setOpenAdressModel] = useState(false);
 
   return (
     <div className="flex gap-4">
@@ -54,12 +53,7 @@ export default function Account() {
               <span className="font-bold text-[20px] mb-6">
                 User address list
               </span>
-              <span
-                onClick={() => setOpenAdressModel(true)}
-                className="float-right cursor-pointer underline "
-              >
-                + Add address
-              </span>
+              <AddAddress />
               <div className="grid grid-cols-2 gap-4 mt-4">
                 {Array.from({ length: 3 }).map((val, index) => {
                   return (
@@ -81,7 +75,6 @@ export default function Account() {
                 })}
               </div>
             </div>
-            <AddressModel open={openAdressModel} setOpen={setOpenAdressModel} />
           </>
         )}
       </div>

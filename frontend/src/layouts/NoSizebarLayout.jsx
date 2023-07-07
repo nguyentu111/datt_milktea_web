@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Header from "../patials/Header";
-export default function UserLayout() {
+export default function NoSizebarLayout() {
   return (
     <>
       <Header />

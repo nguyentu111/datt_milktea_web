@@ -5,8 +5,10 @@ import Modal from "../shared/Modal";
 import { useOnClickOutside } from "usehooks-ts";
 import classNames from "classnames";
 import CartItem from "./CartItem";
+import { Link, useNavigate } from "react-router-dom";
 export default function Cart() {
   const [open, setOpen] = useState(false);
+  const nav = useNavigate();
   return (
     <>
       <button onClick={() => setOpen(true)}>
@@ -33,7 +35,13 @@ export default function Cart() {
                 <span>Total amount : </span>
                 <span>200.00$</span>
               </div>
-              <button className="cart-confirm-btn rounded w-full h-10 mt-2">
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  nav("/checkout");
+                }}
+                className="cart-confirm-btn text-center items-center rounded w-full h-10 mt-2"
+              >
                 Confirm
               </button>
             </div>
