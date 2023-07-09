@@ -5,19 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TypeOfDrink extends Model
+class Role extends Model
 {
     use HasFactory;
-    protected $table = 'type_of_drinks';
-    protected $primaryKey   = 'id';
 
     protected $fillable = [
-        'name',
-    ]; 
+        'user_id',
+        'role'
+    ];
 
     public $timestamps = false;
 
-    public function drinks(){
-        return $this->hasMany(Drink::class);
+    public function staff()
+    {
+        return $this->belongsTo(Staff::class);
     }
 }

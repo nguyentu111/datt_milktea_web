@@ -14,11 +14,13 @@ class Address extends Model
     protected $fillable = [
         'customer_id',
         'address',
+        'is_default'
     ];
 
     public $timestamps = false;
 
-    public function customer(){
+    public function customer()
+    {
         return $this->belongsTo(Customer::class);
     }
 }

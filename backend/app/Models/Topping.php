@@ -15,16 +15,17 @@ class Topping extends Model
         'material_id',
         'drink_id',
         'active',
-        'price_increase',
         'amount'
-    ]; 
+    ];
 
     public $timestamps = false;
 
-    public function drink(){
+    public function drink()
+    {
         return $this->belongsTo(Drink::class);
     }
-    public function material(){
+    public function material()
+    {
         return $this->belongsTo(Material::class);
     }
 }

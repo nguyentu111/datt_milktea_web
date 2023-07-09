@@ -5,14 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Report extends Model
+class Types extends Model
 {
     use HasFactory;
+    protected $table = 'types';
+
     protected $fillable = [
         'name',
-        'report_url',
-        'folder_id',
-        'staff_id',
     ];
-    
+
+    public $timestamps = false;
+
+    public function drinks()
+    {
+        return $this->hasMany(Drink::class);
+    }
 }

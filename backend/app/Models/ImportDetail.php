@@ -5,13 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Folder extends Model
+class ImportDetail extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'name'
+        'material_id',
+        'import_id',
+        'amount',
     ];
-    public function reports(){
-        return $this->hasMany(Report::class);
-    }
 }

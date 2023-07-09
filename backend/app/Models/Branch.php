@@ -22,21 +22,27 @@ class Branch extends Model
 
     public $timestamps = false;
 
-    public function materials(){
-        return $this->belongsToMany(Material::class, 'branch_materials','branch_id', 'material_id' )->withPivot('amount');
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'branch_materials', 'branch_id', 'material_id')
+            ->withPivot('amount');
     }
 
-    public function staffs(){
+    public function staffs()
+    {
         return $this->hasMany(Staff::class);
     }
 
-    public function orders(){
+    public function orders()
+    {
         return $this->hasMany(Order::class);
     }
-    public function exports() {
-        return $this->hasMany(Export::class,'branch_source_id');
+    public function imports()
+    {
+        return $this->hasMany(Import::class, 'branch_des_id');
     }
-    public function supplyRequest(){
-        return $this->hasMany(SupplyRequest::class,'branch_id');
+    public function exports()
+    {
+        return $this->hasMany(Import::class, 'branch_source_id');
     }
 }

@@ -46,4 +46,13 @@ trait CanBeFormatted
 
         return $this;
     }
+    public function castBool()
+    {
+        $this->formatStateUsing(
+            fn (string|null $state): string|null
+            => $state ? 'true' : 'false'
+        );
+
+        return $this;
+    }
 }

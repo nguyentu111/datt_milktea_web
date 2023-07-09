@@ -13,7 +13,13 @@ use App\Models\Staff;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\Position;
-
+use App\Models\Role;
+use App\Tables\StaffTable;
+use DebugBar\DebugBar;
+use Exception;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class StaffController extends Controller
 {
@@ -22,9 +28,9 @@ class StaffController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(StaffTable $staffTable)
     {
-        return new StaffCollection(Staff::paginate(5));
+        return view('bewama::pages/dashboard/staff/index', compact('staffTable'));
     }
 
     /**
@@ -34,7 +40,7 @@ class StaffController extends Controller
      */
     public function create()
     {
-        //
+        return view('bewama::pages/dashboard/staff/create');
     }
 
     /**
@@ -43,69 +49,53 @@ class StaffController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreStaffRequest $request)
+    public function store(Request $request)
     {
-        // $validation = $request->validate([
-        //     'name' => 'required',
-        //     'gender' => 'required',
-        //     'phone_number' => 'required|regex:/(0)[0-9]/|not_regex:/[a-z]/|min:9|unique:staffs,phone_number',
-        //     'address' => 'required',
-        //     'hometown' => 'required',
-        //     'branch_id' => 'required',
-        //     'position_id' => 'required',
-        //     'create_account' => 'required',
-        //     'email' => 'required|email|unique:staffs,email',
-        // ]);
-        // $data = $request->all();
-        // $new_staff = Staff::create([
-        //                 'name' =>  $validation['name'],
-        //                 'gender' =>  $validation['gender'],
-        //                 'phone_number' => $validation['phone_number'],
-        //                 'address' => $validation['address'],
-        //                 'hometown' => $validation['hometown'],
-        //                 'branch_id' => $validation['branch_id'],
-        //                 'position_id' => $validation['position_id'],
-        //                 'dob' => $data['dob'],
-        //                 'email' => $validation['email'],
-        //                 'active' => true,
-        //         ]);
 
-        // if($validation['create_account']){
-        //     $pos_blank = strripos($validation['name'], ' ');
-        //     $name  = '';
-        //     if($pos_blank){
-        //         $name = substr($validation['name'], $pos_blank);
-        //     }
-        //     else{
-        //         $name = $validation['name'];
-        //     }
-        //     $new_user = User::create([
-
-        //                     'username' => strtolower($name).$this->autoUsernameNum((int)$new_staff['id'], (int)$validation['branch_id'], (int)$data['role_id']),
-        //                     'password' => bcrypt('PhucLong123`'),
-        //                     'role_id' => $data['role_id'],
-
-        //                 ]);
-        //     $new_staff['id_login'] = $new_user['id'];
-        //     $new_staff->save();
-        // }
-        // return response()->json([
-        //     'msg' => 'Them nhan vien thanh cong',        
-        // ]);
-        try {
-            $new_staff = new StaffResource(Staff::create($request->all()));
-        }
-        catch (Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'msg' => $e->getMessage(),
-            ],422);
-        }
-        return response()->json([
-            'status' => 'success',
-            'msg' => 'Thêm nhân viên thành công',
-            'newStaff' => $new_staff,
+        $validation = $request->validate([
+            'first_name' => ['required', 'string', 'max:50'],
+            'last_name' => ['required', 'string', 'max:50'],
+            'gender' => 'required',
+            'phone' => 'required|regex:/(0)[0-9]/|not_regex:/[a-z]/|digits:10',
+            'branch_id' => 'required',
+            'roles' => 'required|array|min:1',
+            'email' => 'required|email|unique:users,email',
+            'dob' => 'required',
+            'active' => ['sometimes']
         ]);
+        $uploadedFileUrl = null;
+        if ($request->has('picture')) {
+            $uploadedFileUrl = cloudinary()->upload($request->file('picture')->getRealPath())->getSecurePath();
+        }
+        try {
+            DB::beginTransaction();
+            $newStaff = Staff::create([
+                'first_name' =>  $validation['first_name'],
+                'last_name' =>  $validation['last_name'],
+                'gender' =>  $validation['gender'],
+                'phone' => $validation['phone'],
+                'picture' =>  $uploadedFileUrl,
+                'branch_id' => $validation['branch_id'],
+                'dob' => $validation['dob'],
+                'active' => $validation['active']
+            ]);
+            $newUser = User::create([
+                'staff_id' => $newStaff->id,
+                'email' => $validation['email'],
+                'password' => Hash::make(User::DEFAULT_PASSWORD)
+            ]);
+            foreach ($validation['roles'] as $role) {
+                Role::create([
+                    'user_id' => $newUser->id,
+                    'role' => $role
+                ]);
+            }
+            DB::commit();
+            return redirect('dashboard/staffs')->with('message', __('Add staff successfully'));
+        } catch (Exception $ex) {
+            DB::rollBack();
+            return back()->with('error', __($ex->getMessage()));
+        }
     }
 
     /**
@@ -116,41 +106,7 @@ class StaffController extends Controller
      */
     public function show(Staff $staff)
     {
-        // $staff = Staff::where('id',$id)->first();
-        // return $staff ? response()->json([
-        //     'staff_infomation' => $staff
-        // ]) :  response()->json([
-        //     'msg' => 'Thong tin nhan vien khong ton tai'
-        // ],400);
-
-        // if(!$staff){
-        //     return response()->json([
-        //         'status' => 'error',
-        //         'msg' => $e->getMessage(),
-        //     ],422);
-        // }
-
-        try{
-            $staff_info = new StaffResource($staff);
-        }
-        catch(Exception $e){
-            return response()->json([
-                'status' => 'error',
-                'msg' => $e->getMessage(),
-            ],422);
-        }
-
-        if (!$staff_info){
-            return response()->json([
-                'status' => 'success',
-                'msg' => 'Mã nhân viên không tồn tại',
-            ],201);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'staff_infomation' => $staff_info,
-        ]);
+        return view('bewama::pages/dashboard/staff/show', compact('staff'));
     }
 
     /**
@@ -161,33 +117,55 @@ class StaffController extends Controller
      */
     public function edit($id)
     {
-
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param Staff $staff
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateStaffRequest $request, Staff $staff)
+    public function update(Request $request, Staff $staff)
     {
-        
-        try{
-            $staff->update($request->all());
-        }
-        catch(Exception $e){
-            return response()->json([
-                'status' => 'error',
-                'msg' => $e->getMessage(),
-            ],422);
-        }
-        
-        return response()->json([
-            'status' => 'success',
-            'msg' => 'Sửa thông tin nhân viên thành công.',
+        $validation = $request->validate([
+            'first_name' => ['required', 'string', 'max:50'],
+            'last_name' => ['required', 'string', 'max:50'],
+            'gender' => 'required',
+            'phone' => 'required|regex:/(0)[0-9]/|not_regex:/[a-z]/|digits:10',
+            'branch_id' => 'required',
+            'roles' => 'required|array|min:1',
+            'email' => 'required|email|unique:users,email,' . $staff->user->id,
+            'dob' => 'required',
+            'active' => ['sometimes']
         ]);
+        if (Auth::user()->email == $staff->user->email && $validation['active'] == '0') return  redirect('/dashboard/staffs')->with('error', __('Cannot unactive your self'));
+        $uploadedFileUrl = $staff->picture;
+        if ($request->has('picture')) {
+            $uploadedFileUrl = cloudinary()->upload($request->file('picture')->getRealPath())->getSecurePath();
+        }
+        try {
+            DB::beginTransaction();
+            $staff->update($validation);
+            $staff->roles()->delete();
+            $roles = [];
+            foreach ($validation['roles'] as $role) {
+                $roles[] = [
+                    'user_id' => $staff->user->getKey(),
+                    'role' => $role
+                ];
+            };
+            Role::query()->insertOrIgnore($roles);
+            if ($validation['email'] !== $staff->email) {
+                $staff->user->update(['email' => $validation['email']]);
+            }
+            $staff->update([...$validation, 'picture' => $uploadedFileUrl]);
+            DB::commit();
+            return redirect('/dashboard/staffs')->with('message', __('Update staff successfully'));
+        } catch (Exception $ex) {
+            DB::rollBack();
+            return  redirect('/dashboard/staffs')->with('error', __($ex->getMessage()));
+        }
     }
 
     /**
@@ -198,107 +176,5 @@ class StaffController extends Controller
      */
     public function destroy(Staff $staff)
     {
-        if(
-            $staff->importVouchers()->get() != "[]" ||
-            $staff->supplyVouchers()->get() != "[]" ||
-            $staff->orders()->get() != "[]"
-        ) {
-            return response()->json([
-                'status' => 'false',
-                'msg' => "Nhan vien da lap don khong the xoa",
-            ],400);
-        }
-
-        if($staff['id_login'])
-            User::find($staff['id_login'])->delete();
-
-        try{
-            $staff->delete();
-        }
-        catch(Exception $e){
-            return response()->json([
-                'status' => 'error',
-                'msg' => $e->getMessage(),
-            ],422);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'msg' => 'Xoa nhân viên thành công',
-        ]);
-    }
-
-
-    public function active($id){
-        $staff = Staff::find($id);
-
-        if($staff['active'] ==  true){
-            return response()->json([
-                'status' => 'error',
-                'msg' => 'Nhân viên đang thiết lập hoạt động.',
-            ],422);
-        }
-
-        $staff['active'] = true;
-        
-        try{
-            $staff->update();
-        }
-        catch(Exception $e){
-            return response()->json([
-                'status' => 'error',
-                'msg' => $e->getMessage(),
-            ],422);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'msg' => 'Thiết lập hoạt động thành công.',
-        ]);
-    }
-
-    public function inActive($id){
-        $staff = Staff::find($id);
-
-        if($staff['active'] == false){
-            return response()->json([
-                'status' => 'error',
-                'msg' => 'Nhân viên đang thiết lập ngưng hoạt động.',
-            ],422);
-        }
-
-        $staff['active'] = false;
-        $staff->update();
-
-        try{
-            $staff->update();
-        }
-        catch(Exception $e){
-            return response()->json([
-                'status' => 'error',
-                'msg' => $e->getMessage(),
-            ],422);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'msg' => 'Thiết lập ngừng hoạt động thành công.',
-        ]);
-    }
-
-    public function getPosition(){
-        $position = new PositionCollection(Position::paginate(5));
-        return response()->json([
-            'status' => 'success',
-            'positions' => $position
-        ]);
-    }
-
-    //function support------------------------------------------------
-    public function paddingNumber($a){
-        return $a > 99 ? strval($a) : str_pad($a, 3, '0', STR_PAD_LEFT);
-    }
-    public function autoUsernameNum(int $user_id,int $branch_id,int $role_id){
-        return $this->paddingNumber($user_id).$this->paddingNumber($branch_id).$this->paddingNumber($role_id);
     }
 }

@@ -11,35 +11,42 @@ class Order extends Model
 
     protected $fillable = [
         'status',
-        'staff_id',
+        'customer_id',
+        'cheff_id',
         'branch_id',
         'ship_to',
-        'paid',
+        'ship_note',
         'shipped_at',
-        'customer_id',
+        'ship_amount',
+        'tax_amount',
         'cheff_id',
         'payment_type',
         'bill_url',
-        'ship_price',
-        'total_price',
-        'final_price',
+        'ship_amount',
+        'total_amount',
+        'is_paid',
     ];
 
-    public function branch(){
+    public function branch()
+    {
         return $this->belongsTo(Branch::class);
     }
 
-    public function cheff(){
-        return $this->hasOne(Staff::class,'id','cheff_id');
+    public function cheff()
+    {
+        return $this->hasOne(Staff::class, 'id', 'cheff_id');
     }
 
-    public function drinkSizes(){
-        return $this->belongsToMany(DrinkSize::class, 'order_details',  'order_id','drink_size_id');
+    public function drinkSizes()
+    {
+        return $this->belongsToMany(DrinkSize::class, 'order_details',  'order_id', 'drink_size_id');
     }
-    public function customer(){
+    public function customer()
+    {
         return $this->belongsTo(Customer::class);
     }
-    public function orderDetails(){
+    public function orderDetails()
+    {
         return $this->hasMany(OrderDetail::class);
     }
 }

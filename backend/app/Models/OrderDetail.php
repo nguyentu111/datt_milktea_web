@@ -14,9 +14,8 @@ class OrderDetail extends Model
     protected $fillable = [
         'drink_detail_id',
         'order_id',
-        'price',
-        'quantity',
-        'topping_list'
+        'regular_price',
+        'promotion_price',
     ];
 
     public $timestamps = false;
@@ -24,8 +23,14 @@ class OrderDetail extends Model
 
     protected $casts = [
         'topping_list' => 'array'
-   ];
-   public function drink(){
-        return $this->hasOneThrough(Drink::class,DrinkSize::class);
-   }
+    ];
+    public function drink()
+    {
+        return $this->hasOneThrough(Drink::class, DrinkSize::class);
+    }
+    public function orderToppings()
+    {
+        return $this->belongsToMany(Topping::class, 'order_toppings', 'order_detail_id', 'topping_id')
+            ->withPivot('price');
+    }
 }

@@ -9,14 +9,17 @@ class Import extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'supply_detail_id',
+        'supplier_id',
         'staff_id',
-        'amount',
+        'branch_source',
+        'brach_des'
     ];
-    public function supplyDetails(){
-        return $this->belongsTo(SupplyDetail::class);
+    public function importDetails()
+    {
+        return $this->hasMany(ImportDetail::class);
     }
-    // public function materials(){
-    //     return $this->belongsToMany(Materials::class,'');
-    // }
+    public function products()
+    {
+        return $this->belongsToMany(Products::class, 'import_details', 'import_id', 'material_id');
+    }
 }

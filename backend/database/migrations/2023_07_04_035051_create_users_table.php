@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreign('customer_id')->references('id')->on('customers');
             $table->unsignedBigInteger('staff_id')->nullable();
             $table->foreign('staff_id')->references('id')->on('staffs');
+            $table->string('email');
+            $table->string('password');
             $table->timestamps();
         });
     }

@@ -14,15 +14,13 @@ class DrinkSize extends Model
         'active',
         'drink_id',
         'size_id',
-        'price_increase'
+        'price_up_percent'
     ];
 
 
-    public function orders(){
-        return $this->belongsToMany(Order::class, 'order_details', 'drink_size_id', 'order_id')->withPivot(['total_price', 'topping_list']);
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class, 'order_details', 'drink_size_id', 'order_id')
+            ->withPivot(['regular_price', 'promotion_pirce']);
     }
-    public function materials(){
-        return $this->belongsToMany(Material::class, 'recipes', 'drink_size_id','material_id')->withPivot('amount');
-    } 
- 
 }
