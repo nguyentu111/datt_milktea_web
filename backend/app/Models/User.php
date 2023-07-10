@@ -28,6 +28,14 @@ class User extends Authenticatable
     }
     public function staff()
     {
-        return $this->belongsTo(Satff::class);
+        return $this->belongsTo(Staff::class);
+    }
+    public function roles()
+    {
+        return $this->hasMany(Role::class);
+    }
+    public function hasRole($role)
+    {
+        return $this->role()->where(['role' => $role])->exists();
     }
 }

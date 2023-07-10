@@ -134,7 +134,7 @@
                                 const cancleBtn = document.getElementById('cancle-change-picture');
                                 const selectImage = document.getElementById('staff-picture');
                                 cancleBtn.onclick = () => {
-                                    preview.src = oldPictureUrl;
+                                    preview.src = oldPictureUrl ? oldPictureUrl : "{{asset('assets/images/staff-placeholder.jpg')}}";
                                     cancleBtn.style.display = 'none'
                                     selectImage.value = null;
                                 }

@@ -143,7 +143,7 @@
 
 
                             <div>
-                                <label for="email" class="block  text-sm font-medium leading-6 text-gray-900">{{ __('First name') }}</label>
+                                <label for="first_name" class="block  text-sm font-medium leading-6 text-gray-900">{{ __('First name') }}</label>
                                 <div class="mt-2">
                                     <x-bewama::form.input.text name="first_name" value="{{ old('first_name')}}" type="first_name" placeholder="Please fill staff first name" />
                                     <x-input-error :messages="$errors->get('first_name')" class="mt-2 text-error" />
@@ -221,7 +221,7 @@
                             </div>
 
                             <div>
-                                <label for="phone_number" class="block text-sm font-medium leading-6 text-gray-900">{{ __('Phone number') }}</label>
+                                <label for="phone" class="block text-sm font-medium leading-6 text-gray-900">{{ __('Phone number') }}</label>
                                 <div class="mt-2">
                                     <x-bewama::form.input.text name="phone" type="text" value="{{ old('phone')}}" placeholder="Please fill phone number" />
                                     <x-input-error :messages="$errors->get('phone')" class="mt-2 text-error" />

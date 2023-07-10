@@ -11,10 +11,12 @@ class DeleteAction extends Action
 
     public function render(Model $model): View|string
     {
-        return view('bewama::components.actions.delete', [
-            'label' => $this->getLabel(),
-            'model' => $model,
-            'url' => $this->getUrl($model),
-        ]);
+        if ($this->canShow($model))
+            return view('bewama::components.actions.delete', [
+                'label' => $this->getLabel(),
+                'model' => $model,
+                'url' => $this->getUrl($model),
+            ]);
+        else return "";
     }
 }

@@ -12,6 +12,8 @@ class BranchMaterial extends Model
     protected $primaryKey   = ['branch_id', 'material_id'];
 
     protected $fillable = [
+        'branch_id',
+        'material_id',
         'amount',
     ];
 }

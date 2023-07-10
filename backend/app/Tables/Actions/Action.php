@@ -10,7 +10,19 @@ abstract class Action
     protected string|null $label = null;
 
     protected Closure|string|null $url = null;
+    protected Closure|null $showWhen = null;
 
+    public function showWhen(Closure $callback)
+    {
+        $this->showWhen = $callback;
+        return $this;
+    }
+    protected function canShow(Model $model): bool
+    {
+        if ($this->showWhen) {
+            return call_user_func_array($this->showWhen, [$model]);
+        } else return true;
+    }
     public function __construct(protected string|null $name)
     {
     }

@@ -9,9 +9,11 @@ class LinkAction extends Action
 {
     public function render(Model $model): View|string
     {
-        return view('bewama::components.actions.link', [
-            'label' => $this->getLabel(),
-            'url' => $this->getUrl($model),
-        ]);
+        if ($this->canShow($model))
+            return view('bewama::components.actions.link', [
+                'label' => $this->getLabel(),
+                'url' => $this->getUrl($model),
+            ]);
+        else return "";
     }
 }
