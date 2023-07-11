@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Size;
 use App\Models\Tax;
 use App\Models\Type;
 use App\Models\Uom;
@@ -26,13 +27,14 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $materials = Product::query()->with(['type' => function ($query) {
-            $query->where('name', Product::Materials);
-        }])->get();
+        $materials = Product::query()->whereHas('type', function ($query) {
+            $query->where('name', 'Materials');
+        })->get();
         $taxs = Tax::all();
         $uoms = Uom::all();
         $types = Type::all();
-        return view("bewama::pages/dashboard/product/create", compact('materials', 'taxs', 'types', 'uoms'));
+        $sizes = Size::all();
+        return view("bewama::pages/dashboard/product/create", compact('materials', 'taxs', 'types', 'uoms', 'sizes'));
     }
 
     /**
@@ -40,7 +42,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+        dd($request->all());
         $data = $request->validate([
             'name' => ['required', 'unique:' . Product::class . ',name', 'string', 'max:50'],
             'description' => ['sometimes', 'max:255'],

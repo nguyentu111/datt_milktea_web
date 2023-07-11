@@ -5,6 +5,7 @@ use App\Http\Controllers\Branch\SearchBranchController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SizeController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\TypeController;
@@ -33,6 +34,7 @@ Route::prefix('dashboard')->group(function () {
         Route::resource('staffs', StaffController::class);
         Route::resource('taxes', TaxController::class);
         Route::resource('products', ProductController::class);
+        Route::resource('sizes', SizeController::class);
         Route::resource('types', TypeController::class);
         Route::resource('uoms', UomController::class);
         Route::resource('branches', BranchController::class);

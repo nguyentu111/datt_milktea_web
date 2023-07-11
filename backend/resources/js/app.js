@@ -1,10 +1,11 @@
 import "./bootstrap";
 
 import "./imports/show.js";
+import "./products/create.js";
 import "./staffs/create.js";
 
 import Alpine from "alpinejs";
-
+import lodash from "lodash";
 import $ from "jquery";
 
 // Import flatpickr

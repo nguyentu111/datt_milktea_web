@@ -1,0 +1,11 @@
+[
+	size_id: 2,
+	active : true,
+	price_up_percent : 1.12,
+	materials: [
+		{
+			material_id: 1,
+			amount : 12
+		}
+	]
+]

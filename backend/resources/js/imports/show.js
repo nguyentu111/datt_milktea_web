@@ -4,17 +4,17 @@ import toast from "toastr";
 
 import swal from "sweetalert";
 
-function handleBackDrop() {
-    $("#backdrop").hide();
-    $("#search-customer").parent().css("z-index", 50);
-    $("#result-user").hide();
-    $("#search-user").parent().css("z-index", 50);
-    $("#result-customer").hide();
-}
+// function handleBackDrop() {
+//     $("#backdrop").hide();
+//     $("#search-customer").parent().css("z-index", 50);
+//     $("#result-user").hide();
+//     $("#search-user").parent().css("z-index", 50);
+//     $("#result-customer").hide();
+// }
 
-$("#backdrop").on("click", function (e) {
-    handleBackDrop();
-});
+// $("#backdrop").on("click", function (e) {
+//     handleBackDrop();
+// });
 
 // $("#search-user").on("input", function () {
 //     clearTimeout(this.delay);
