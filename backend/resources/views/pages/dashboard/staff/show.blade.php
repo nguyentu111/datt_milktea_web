@@ -253,7 +253,7 @@
                                     </div>
                                     <div class="flex gap-2 items-center">
                                         <input id="unactive" name="active" value="0" type='radio' @if(old('active') !==null ? !old('active') : !$staff->active) checked @endif/>
-                                        <label for="unactive">Unactive</label>
+                                        <label for="unactive">Deactive</label>
                                     </div>
                                 </div>
                                 <x-input-error :messages="$errors->get('active')" class="mt-2 text-error" />

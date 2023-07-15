@@ -10,13 +10,13 @@ use Illuminate\Http\Request;
 abstract class Table
 {
     protected int $perPage = 15;
-    
+
     protected string|null $heading = null;
-    
+
     protected string|null $description = null;
-    
+
     public function __construct(
-  
+
         protected Request $request
     ) {
     }

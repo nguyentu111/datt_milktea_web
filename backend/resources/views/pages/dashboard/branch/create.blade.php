@@ -71,7 +71,7 @@
                                     </div>
                                     <div class="flex gap-2 items-center">
                                         <input id="unactive" name="active" value="0" type='radio' />
-                                        <label for="unactive">Unactive</label>
+                                        <label for="unactive">Deactive</label>
                                     </div>
                                 </div>
                                 <x-input-error :messages="$errors->get('active')" class="mt-2 text-error" />

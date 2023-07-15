@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
@@ -23,6 +25,7 @@ class Product extends Model
         'type_id',
         'active',
     ];
+
     public function toppings()
     {
         return $this->hasMany(Topping::class, 'drink_id', 'id');
@@ -56,6 +59,34 @@ class Product extends Model
     public function uom()
     {
         return $this->belongsTo(Uom::class);
+    }
+    public function getCurrentImportPriceAttribute()
+    {
+        $id = $this->getAttribute('id');
+        return ProductImPrice::query()->where('product_id', $id)->latest('apply_from')->value('price');
+    }
+    public function getCurrentExportPriceAttribute()
+    {
+        $id = $this->getAttribute('id');
+        return ProductExPrice::query()->where('product_id', $id)->latest('apply_from')->value('price');
+    }
+    public function getLastestImportApplyFromAttribute()
+    {
+        $id = $this->getAttribute('id');
+        return ProductImPrice::query()->where('product_id', $id)->latest('apply_from')->value('apply_from');
+    }
+    public function getLastestExportApplyFromAttribute()
+    {
+        $id = $this->getAttribute('id');
+        return ProductExPrice::query()->where('product_id', $id)->latest('apply_from')->value('apply_from');
+    }
+    public function importPrices(): HasMany
+    {
+        return $this->hasMany(ProductImPrice::class);
+    }
+    public function exportPrices()
+    {
+        return $this->hasMany(ProductExPrice::class);
     }
     public function sluggable(): array
     {

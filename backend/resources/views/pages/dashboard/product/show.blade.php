@@ -98,6 +98,7 @@
                                     @endforeach
                                 </x-bewama::form.input.select>
                             </div>
+
                             <div class="flex justify-between">
                                 <div class="pt-4">
                                     <div class="mt-2 flex gap-4">

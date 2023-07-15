@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class ProductImPrice extends Model
 {
     use HasFactory;
-
+    protected $casts = [
+        'price' => 'float'
+    ];
     protected $fillable = [
         'product_id',
         'price',

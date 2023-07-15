@@ -3,7 +3,7 @@
         <div class="flex flex-1 flex-col justify-center w-full">
             <div class=" w-full">
                 <div>
-                    <h2 class="mt-2 text-2xl font-bold leading-9 tracking-tight text-gray-900">Add new tax</h2>
+                    <h2 class="mt-2 text-2xl font-bold leading-9 tracking-tight text-gray-900">Add new uom </h2>
                 </div>
                 <form method="POST" action="{{ route('uoms.store') }}" class="">
                     @csrf

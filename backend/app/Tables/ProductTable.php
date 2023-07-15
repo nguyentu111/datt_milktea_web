@@ -3,6 +3,7 @@
 namespace App\Tables;
 
 use App\Models\Product;
+use App\Tables\Actions\DeleteAction;
 use App\Tables\Actions\LinkAction;
 use App\Tables\Columns\ActionColumn;
 use App\Tables\Columns\TextColumn;
@@ -70,7 +71,8 @@ class ProductTable extends Table
                     LinkAction::make()
                         ->label('View')
                         ->url(fn (Product $product): string => route('products.show', $product)),
-                ),
+                )
+
         ];
     }
 

@@ -23,7 +23,7 @@ class TypeController extends Controller
      */
     public function create()
     {
-        $types = Type::all();
+        $types = Type::query()->whereNot('name', 'Toppings')->whereNot('name', 'Materials')->get();
         return view('bewama::pages/dashboard/type/create', compact('types'));
     }
 

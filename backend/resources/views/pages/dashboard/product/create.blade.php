@@ -98,7 +98,7 @@
                                         </div>
                                         <div class="flex gap-2 items-center">
                                             <input id="unactive" name="active" value="0" type='radio' />
-                                            <label for="unactive">Unactive</label>
+                                            <label for="unactive">Deactive</label>
                                         </div>
                                     </div>
                                     <x-input-error :messages="$errors->get('active')" class="mt-2 text-error" />
@@ -146,7 +146,7 @@
                                         <div class="col-span-4 gap-4 flex items-center select-none">
                                             <label for="active-{{$size->id}}">active</label>
                                             <input id="active-{{$size->id}}" name="active-{{$size->id}}" value="1" type='radio' checked />
-                                            <label for="unactive-{{$size->id}}">unactive</label>
+                                            <label for="unactive-{{$size->id}}">Deactive</label>
                                             <input id="unactive-{{$size->id}}" name="active-{{$size->id}}" value="0" type='radio' />
                                         </div>
 
