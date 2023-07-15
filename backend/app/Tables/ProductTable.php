@@ -55,6 +55,9 @@ class ProductTable extends Table
             TextColumn::make('tax')
                 ->withSub('percent')
                 ->label('tax'),
+            TextColumn::make('uom')
+                ->withSub('name')
+                ->label('Uom'),
             TextColumn::make('type')
                 ->withSub('name')
                 ->label('Type'),

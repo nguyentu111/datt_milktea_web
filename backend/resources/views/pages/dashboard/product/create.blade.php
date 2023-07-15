@@ -1,18 +1,20 @@
 <x-app-layout>
-    <div class="flex min-h-full mx-6">
+    <div class="flex min-h-full mx-6 pb-6">
         <div class="flex flex-1 flex-col justify-center w-full">
             <div class=" w-full">
                 <div>
                     <h2 class="mt-2 text-2xl font-bold leading-9 tracking-tight text-gray-900">Add new product</h2>
                 </div>
-                <form id='create-product-form' method="POST" action="{{ route('products.store') }}" class="grid grid-cols-2 gap-4" enctype="multipart/form-data">
+                <form id='create-product-form' method="POST" action="{{ route('products.store') }}" class="" enctype="multipart/form-data">
                     @csrf
-                    <div class="border-slate-500 rounded-lg shadow-lg p-6 bg-white">
+                    <div class="border-slate-500 rounded-lg shadow-lg p-6 bg-white mb-4">
+                        <span class="font-bold">INFOMATION</span>
+
                         <div class="">
                             <div class="h-48 rounded border-2 m-auto w-full mb-4">
                                 <img src="{{ asset('assets/images/img-placeholder.png') }}" class="w-full h-full object-contain" id="preview" />
                             </div>
-                            <input id="product-picture" name="picture" type="file" accept=".png,.jpg,.jepg" placeholder="Choose picture" />
+                            <input id="product-picture" name="picture" type="file" accept=".png,.jpg,.jepg" placeholder="Choose picture" required />
                             <x-input-error :messages="$errors->get('picture')" class="mt-2 text-error" />
 
                             @push('script')
@@ -35,7 +37,7 @@
                             <div class="pt-4">
                                 <label for="name" class="block text-sm font-medium leading-6 text-gray-900">{{ __('Name') }}</label>
                                 <div class="mt-2">
-                                    <x-bewama::form.input.text name="name" value="{{ old('name')}}" type="text" placeholder="Please fill product name" />
+                                    <x-bewama::form.input.text name="name" value="{{ old('name')}}" type="text" placeholder="Please fill product name" required />
                                     <x-input-error :messages="$errors->get('name')" class="mt-2 text-error" />
                                 </div>
                             </div>
@@ -71,6 +73,22 @@
                                     @endforeach
                                 </x-bewama::form.input.select>
                             </div>
+                            <div class="pt-4">
+                                <label for="type" class="block  text-sm font-medium leading-6 text-gray-900">{{ __('Import price (vnd)') }}</label>
+                                <div class="mt-2">
+                                    <x-bewama::form.input.text name="import_price" value="{{ old('import_price')}}" type="text" placeholder="Please fill import price" class="decimal-only moneyformat" />
+                                    <x-input-error :messages="$errors->get('import_price')" class="mt-2 text-error " />
+                                </div>
+
+                            </div>
+                            <div class="pt-4">
+                                <label for="type" class="block  text-sm font-medium leading-6 text-gray-900">{{ __('Export price (vnd)') }}</label>
+                                <div class="mt-2">
+                                    <x-bewama::form.input.text name="export_price" value="{{ old('export_price')}}" type="text" placeholder="Please fill export price" class="decimal-only moneyformat" />
+                                    <x-input-error :messages="$errors->get('export_price')" class="mt-2 text-error" />
+                                </div>
+
+                            </div>
                             <div class="flex justify-between">
                                 <div class="pt-4">
                                     <div class="mt-2 flex gap-4">
@@ -105,18 +123,15 @@
                         </div>
 
                     </div>
-                    <div>
+                    <div class="grid grid-cols-2 gap-4">
 
 
                         <div class="border-slate-500 rounded-lg shadow-lg p-6 bg-white w-full">
-                            <button id="add-recipes" type='button' class="bg-green-500 p-2 rounded 
-                            text-white text-[13px] font-bold">+ Add size</button>
-                            <div class="flex gap-4">
-                                <button class="p-2 bg-red-400 text-white rounded text-[13px] font-bold" type="button" id='cancle-add-recipes' style="display: none;">Cancle</button>
-                                <x-bewama::form.input.text name="search-mat" placeholder="Search materials" style="display: none;" class="w-full" />
-                            </div>
+                            <span class="font-bold">ADD SIZES AND RECIPES</span>
 
-                            <div id="recipes" style="display: none;" class='max-h-400 overflow-y-scroll grid grid-cols-3 gap-3 mt-5'>
+                            <x-bewama::form.input.text name="search-mat" placeholder="Search materials" class="w-full" />
+
+                            <div id="recipes" class='max-h-400 overflow-y-scroll grid grid-cols-3 gap-3 mt-5'>
                                 <x-bewama::form.input.select name="size" class="w-full col-span-3" multiple>
                                     @foreach($sizes as $size)
                                     <option value="{{$size->id}}">
@@ -124,20 +139,20 @@
                                     </option>
                                     @endforeach
                                 </x-bewama::form.input.select>
-                                <div class="col-span-3">
+                                <div class="col-span-3 ">
                                     @foreach($sizes as $size)
-                                    <div class="grid grid-cols-8 items-center mb-1">
+                                    <div data-size="{{$size->id}}" style="display: none;" class="size-section grid grid-cols-8 items-center mb-1">
                                         <span class="font-bold col-span-1">{{$size->name}}</span>
-                                        <div class="col-span-4 gap-4 flex items-center">
-                                            <label>active</label>
-                                            <input type="checkbox" />
-                                            <label>unactive</label>
-                                            <input type="checkbox" />
+                                        <div class="col-span-4 gap-4 flex items-center select-none">
+                                            <label for="active-{{$size->id}}">active</label>
+                                            <input id="active-{{$size->id}}" name="active-{{$size->id}}" value="1" type='radio' checked />
+                                            <label for="unactive-{{$size->id}}">unactive</label>
+                                            <input id="unactive-{{$size->id}}" name="active-{{$size->id}}" value="0" type='radio' />
                                         </div>
 
                                         <div class="flex gap-2 col-span-3 items-center">
                                             <label class="">Price up</label>
-                                            <x-bewama::form.input.text name="price-up-{{$size->id}}" placeholder="percent" class="max-w-[100px]" />
+                                            <x-bewama::form.input.text name="price-up-{{$size->id}}" placeholder="percent" class="max-w-[100px] decimal-only" />
                                         </div>
                                     </div>
                                     @endforeach
@@ -158,7 +173,7 @@
                                         <button type='button' class="ml-auto px-1 float-right rounded bg-red-500 text-white delete-size">delete</button>
                                         <button type='button' style="display: none;" class="ml-auto px-1 float-right rounded bg-green-500 text-white add-size">add</button>
                                         <div class="relative mt-1">
-                                            <x-bewama::form.input.text type="text" name="recipes-{{$mat->id}}-{{$size->id}}" placeholder="amount" class="w-full decimal-only" autocomplete="off" />
+                                            <x-bewama::form.input.text type="text" name="recipes-{{$mat->id}}-{{$size->id}}" placeholder="amount" class="w-full decimal-only mat-amount-input" autocomplete="off" />
                                             <span class="absolute top-[50%] right-2  -translate-y-[50%] text-gray-400">{{$mat->uom->name}}</span>
                                         </div>
                                     </div>
@@ -166,170 +181,257 @@
                                 </div>
                                 @endforeach
                             </div>
-                            @push('script')
-                            <script>
-                                const addRecipesBtn = $("#add-recipes");
-                                const cancleBtn = $("#cancle-add-recipes");
-                                const recipesElement = $("#recipes");
-                                const materialInput = $(".mat-input");
-                                const searchMat = $("#search-mat");
-                                const pictureInput = $("#product-picture");
-                                const sizes = <?php echo json_encode($sizes); ?>;
-                                const sizeInput = $("#size");
-                                const sizesChoosed = []
-                                const deleteSize = $(".delete-size");
-                                const addSize = $('.add-size');
-                                sizeInput.on("change", function(e) {
-                                    const matItems = $('.mat-item').toArray();
-                                    matItems.forEach(item => {
-                                        const checked = item.children[0].children[0].children[1].checked;
-                                        if (checked) {
-                                            $(item).children('.mat-amount').toArray().forEach(item => {
-                                                const size = $(item).data('size');
-                                                if (!sizeInput.val().includes(size + '')) $(item).hide();
-                                                else $(item).show();
-                                            })
 
-                                        }
-                                    })
-                                });
-                                deleteSize.on('click', function(e) {
-                                    $(e.target).hide();
-                                    $(e.target).next().next().hide();
-                                    $(e.target).next().show();
-
-                                })
-                                addSize.on('click', function(e) {
-                                    $(e.target).prev().show();
-                                    $(e.target).hide();
-                                    $(e.target).next().show();
-                                })
-                                materialInput.on("change", function(e) {
-                                    if (e.target.checked) {
-                                        const element = $(e.target.closest(".mat-item")).children(".mat-amount").toArray();
-                                        element.forEach(item => {
-                                            const sizeId = $(item).data('size');
-                                            if (sizeInput.val().includes(sizeId + "")) $(item).show();
-
-                                        })
-                                    } else $(e.target.closest(".mat-item")).children(".mat-amount")?.hide();
-                                });
-                                addRecipesBtn.on("click", function() {
-                                    cancleBtn.show();
-                                    addRecipesBtn.hide();
-                                    recipesElement.show();
-                                    searchMat.show();
-                                });
-                                cancleBtn.on("click", function() {
-                                    cancleBtn.hide();
-                                    addRecipesBtn.show();
-                                    recipesElement.hide();
-                                    searchMat.hide();
-                                });
-                                searchMat.on("input", function(e) {
-                                    const searchTerm = e.target.value;
-                                    clearTimeout(this.delay);
-                                    this.delay = setTimeout(
-                                        function() {
-                                            $("#recipes > div")
-                                                .toArray()
-                                                .forEach((item) => {
-                                                    const checked =
-                                                        item.children[0].children[0].children[1].checked;
-                                                    if (!checked) item.style.display = "none";
-                                                    if (
-                                                        !searchTerm ||
-                                                        item.children[1].textContent
-                                                        .toLowerCase()
-                                                        .includes(searchTerm.toLowerCase())
-                                                    )
-                                                        item.style.display = "block";
-                                                });
-                                        }.bind(this),
-                                        800
-                                    );
-                                });
-                                $("input.decimal-only").on("keydown", function(event) {
-                                    if (event.shiftKey == true) {
-                                        event.preventDefault();
-                                    }
-                                    if (
-                                        (event.keyCode >= 48 && event.keyCode <= 57) ||
-                                        (event.keyCode >= 96 && event.keyCode <= 105) ||
-                                        event.keyCode == 8 ||
-                                        event.keyCode == 9 ||
-                                        event.keyCode == 37 ||
-                                        event.keyCode == 39 ||
-                                        event.keyCode == 46 ||
-                                        event.keyCode == 190
-                                    ) {} else {
-                                        event.preventDefault();
-                                    }
-                                    if ($(this).val().indexOf(".") !== -1 && event.keyCode == 190)
-                                        event.preventDefault();
-                                });
-                                // const createProductForm = $("#create-product-form");
-                                // createProductForm.on("submit", (e) => {
-                                //     // e.preventDefault();
-                                //     const data = lodash.concat(...createProductForm.serializeArray());
-                                //     let mats = null;
-                                //     console.log(data);
-                                //     if (addRecipesBtn.is(":hidden")) {
-                                //         mats = [];
-                                //         data.forEach((item) => {
-                                //             if (item.name.includes("mat")) {
-                                //                 const id = item.name.substring(4);
-                                //                 if (!isNaN(id)) {
-                                //                     const amount = data.find(
-                                //                         (item) => item.name === "mat-amount-" + id
-                                //                     ).value;
-                                //                     mats.push({
-                                //                         id,
-                                //                         amount: parseFloat(amount),
-                                //                     });
-                                //                 }
-                                //             }
-                                //         });
-                                //     }
-                                //     $.ajax({
-                                //         url: "/dashboard/products/create",
-                                //         method: "POST",
-                                //         data: formData,
-                                //         contentType: false,
-                                //         processData: false,
-                                //         success: function(response) {
-                                //             console.log(response);
-                                //         },
-                                //     });
-                                // });
-                                const form = $('#create-product-form');
-                                form.on('submit', function(e) {
-                                    e.preventDefault();
-                                    let size = null;
-                                    if (addRecipesBtn.is(":hidden")) {
-                                        size = [];
-                                        // const data = lodash.concat(...form.serializeArray());
-                                        const data = form.serializeArray().reduce((acc, item) => {
-                                            return {
-                                                ...acc,
-                                                [item.name]: item.value
-                                            }
-                                        }, {})
-                                        console.log(data);
-                                        $('.decimal-only').toArray().forEach(item => {
-                                            if (!$(item).is(':hidden')) {
-                                                const material_id = $(item).attr('name').split('-')[1];
-                                                const size_id = $(item).attr('name').split('-')[2];
-                                                const amount = $(item).val();
-                                                size.push()
-                                            }
-                                        })
-                                    }
-                                })
-                            </script>
-                            @endpush
                         </div>
+                        <div class="border-slate-500 rounded-lg shadow-lg p-6 bg-white w-full">
+                            <span class="font-bold">ADD TOPPING</span>
+                            <x-bewama::form.input.text name="search-topping" placeholder="Search toppings" class="w-full" />
+                            <div class="grid grid-cols-3 gap-4">
+                                @foreach($materials as $topping)
+                                <div class="relative topping-item">
+                                    <label for="topping-{{$topping->id}}">
+                                        <div class=' cursor-pointer'>
+                                            <img class="w-full aspect-square object-cover" src="{{$topping->picture ?? asset('assets/images/img-placeholder.png') }}" />
+                                            <input id="topping-{{$topping->id}}" name="topping-{{$topping->id}}" type="checkbox" class="topping-input absolute top-3 left-3" />
+                                        </div>
+                                    </label>
 
+                                    <span class="truncate text-center block">{{$topping->name}}</span>
+
+                                    <div class=" topping-amount mt-2" style="display: none;">
+
+                                        <div class="flex items-center gap-4">
+                                            <input id="active-topping-{{$topping->id}}" name="active-topping-{{$topping->id}}" type='checkbox' class="active-topping" @if(old('active-topping-{{$topping->id}}')) @if( old('active-topping-{{$topping->id}}')=='on' ) ) checked @endif @else checked @endif />
+                                            <label for="active-topping-{{$topping->id}}" class="select-none">active</label>
+                                        </div>
+                                        <!-- <button type='button' style="display: none;" class="ml-auto px-1 float-right rounded bg-green-500 text-white add-size">add</button> -->
+                                        <div class="relative mt-1">
+                                            <x-bewama::form.input.text type="text" data-material="{{$topping->id}}" name="" placeholder="amount" class="w-full decimal-only topping-amount-input" autocomplete="off" />
+                                            <span class="absolute top-[50%] -translate-y-[50%] right-2 text-gray-400">{{$topping->uom->name}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        @push('script')
+                        <script>
+                            const recipesElement = $("#recipes");
+                            const materialInput = $(".mat-input");
+                            const toppingInput = $('.topping-input');
+
+                            const searchMat = $("#search-mat");
+                            const searchTopping = $("#search-topping");
+                            const pictureInput = $("#product-picture");
+                            const sizes = <?php echo json_encode($sizes); ?>;
+                            const sizeInput = $("#size");
+                            const deleteSize = $(".delete-size");
+                            const addSize = $('.add-size');
+                            const sizeSection = $('.size-section');
+                            const imgInput = $('#product-picture');
+                            const activeToppings = $('.active-topping');
+                            const toppingAmountInput = $('.topping-amount-input');
+                            const updateRequiredAmountInput = () => {
+                                $('.mat-amount-input').toArray().forEach(item => {
+                                    if ($(item).is(':hidden')) {
+                                        $(item).attr('required', false);
+                                    } else $(item).attr('required', true);
+                                })
+                            }
+                            const updateRequiredAmountToppingInput = () => {
+                                toppingAmountInput.toArray().forEach(item => {
+                                    if ($(item).is(':hidden')) {
+                                        $(item).attr('required', false);
+                                    } else $(item).attr('required', true);
+                                })
+                            }
+                            sizeInput.on("change", function(e) {
+                                const matItems = $('.mat-item').toArray();
+                                matItems.forEach(item => {
+                                    const checked = item.children[0].children[0].children[1].checked;
+                                    if (checked) {
+                                        $(item).children('.mat-amount').toArray().forEach(item => {
+                                            const size = $(item).data('size');
+                                            if (!sizeInput.val().includes(size + '')) $(item).hide({
+                                                complete: updateRequiredAmountInput
+                                            });
+                                            else $(item).show({
+                                                complete: updateRequiredAmountInput
+                                            });
+                                        })
+
+                                    }
+                                })
+                                sizeSection.toArray().forEach(item => {
+                                    const size = $(item).data('size');
+                                    if (sizeInput.val().includes(size + '')) {
+                                        $(item).show();
+                                        //set price up input required
+                                        $(item.children[2].children[1]).attr("required", true);
+
+                                    } else {
+                                        $(item).hide();
+                                        $(item.children[2].children[1]).attr("required", false);
+                                    }
+                                })
+                            });
+                            deleteSize.on('click', function(e) {
+                                $(e.target).hide();
+                                $(e.target).next().next().hide();
+                                $(e.target).next().show();
+
+                            })
+                            addSize.on('click', function(e) {
+                                $(e.target).prev().show();
+                                $(e.target).hide();
+                                $(e.target).next().show();
+                            })
+
+                            materialInput.on("change", function(e) {
+                                if (e.target.checked) {
+                                    const element = $(e.target.closest(".mat-item")).children(".mat-amount").toArray();
+                                    element.forEach(item => {
+                                        const sizeId = $(item).data('size');
+                                        if (sizeInput.val().includes(sizeId + "")) {
+                                            $(item).show({
+                                                complete: updateRequiredAmountInput
+                                            });
+                                        };
+
+                                    })
+                                } else {
+                                    $(e.target.closest(".mat-item")).children(".mat-amount")?.hide({
+                                        complete: updateRequiredAmountInput
+                                    })
+
+                                };
+                            });
+                            toppingInput.on("change", function(e) {
+                                if (e.target.checked) {
+                                    const element = $(e.target.closest(".topping-item")).children(".topping-amount");
+                                    element.show({
+                                        complete: updateRequiredAmountToppingInput
+                                    });
+                                } else {
+                                    $(e.target.closest(".topping-item")).children(".topping-amount")?.hide({
+                                        complete: updateRequiredAmountToppingInput
+                                    })
+
+                                };
+                            });
+                            searchMat.on("input", function(e) {
+                                const searchTerm = e.target.value;
+                                clearTimeout(this.delay);
+                                this.delay = setTimeout(
+                                    function() {
+                                        $("#recipes > div.mat-item")
+                                            .toArray()
+                                            .forEach((item) => {
+                                                const checked =
+                                                    item.children[0].children[0].children[1].checked;
+                                                if (!checked) item.style.display = "none";
+                                                if (
+                                                    !searchTerm ||
+                                                    item.children[1].textContent
+                                                    .toLowerCase()
+                                                    .includes(searchTerm.toLowerCase())
+                                                )
+                                                    item.style.display = "block";
+                                            });
+                                    }.bind(this),
+                                    800
+                                );
+                            });
+                            searchTopping.on("input", function(e) {
+                                const searchTerm = e.target.value;
+                                clearTimeout(this.delay);
+                                this.delay = setTimeout(
+                                    function() {
+                                        $("div.topping-item")
+                                            .toArray()
+                                            .forEach((item) => {
+                                                const checked =
+                                                    item.children[0].children[0].children[1].checked;
+                                                if (!checked) item.style.display = "none";
+                                                if (
+                                                    !searchTerm ||
+                                                    item.children[1].textContent
+                                                    .toLowerCase()
+                                                    .includes(searchTerm.toLowerCase())
+                                                )
+                                                    item.style.display = "block";
+                                            });
+                                    }.bind(this),
+                                    800
+                                );
+                            });
+                            const form = $('#create-product-form');
+                            form.on('submit', function(e) {
+                                const data = form.serializeArray().reduce((acc, item) => {
+                                    return {
+                                        ...acc,
+                                        [item.name]: item.value
+                                    }
+                                }, {})
+                                console.log(data);
+                                if (data.sizes && data.toppings) return;
+                                e.preventDefault();
+                                const sizes = [];
+                                const toppings = [];
+                                $('.size-section').toArray().forEach(item => {
+
+                                    if (!$(item).is(':hidden')) {
+
+                                        const size_id = $(item).data('size');
+                                        const active = item.children[1].children[1].checked
+                                        const price_up_percent = +item.children[2].children[1].value
+                                        const materials = []
+                                        sizes.push({
+                                            size_id,
+                                            active,
+                                            price_up_percent,
+                                            materials
+                                        })
+                                    }
+                                })
+                                $('.mat-amount-input').toArray().forEach(item => {
+                                    if (!$(item).is(':hidden')) {
+                                        const material_id = +$(item).attr('name').split('-')[1];
+                                        const size_id = +$(item).attr('name').split('-')[2];
+                                        const amount = +$(item).val();
+                                        const size = sizes.find((item) => item.size_id == size_id)
+                                        size.materials.push({
+                                            material_id,
+                                            amount
+                                        })
+                                    }
+                                })
+                                toppingAmountInput.toArray().forEach(item => {
+                                    if (!$(item).is(':hidden')) {
+                                        const materialId = $(item).data('material');
+                                        toppings.push({
+                                            'material_id': materialId,
+                                            active: $(item).closest('.topping-amount').toArray()[0].children[0].children[0].checked,
+                                            amount: +$(item).val()
+                                        })
+                                    }
+                                })
+                                console.log({
+                                    toppings
+                                });
+                                var input1 = $("<input>")
+                                    .attr("type", "hidden")
+                                    .attr("name", "sizes").val(JSON.stringify(sizes));
+                                var input2 = $("<input>")
+                                    .attr("type", "hidden")
+                                    .attr("name", "toppings").val(JSON.stringify(toppings));
+                                form.append(input1);
+                                form.append(input2);
+                                form.submit();
+
+                            })
+                        </script>
+                        @endpush
                     </div>
 
                 </form>

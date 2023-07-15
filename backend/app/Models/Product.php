@@ -23,21 +23,23 @@ class Product extends Model
         'type_id',
         'active',
     ];
-
-    public $timestamps = false;
-
-
     public function toppings()
     {
-        return $this->hasMany(Topping::class);
+        return $this->hasMany(Topping::class, 'drink_id', 'id');
     }
-
+    public function recipes()
+    {
+        return $this->hasManyThrough(Recipe::class, DrinkSize::class, 'drink_id', 'drink_size_id', 'id', 'id');
+    }
     public function sizes()
     {
         return $this->belongsToMany(Size::class, 'drink_sizes', 'drink_id', 'size_id')
             ->withPivot(['id', 'active', 'price_up_percent']);
     }
-
+    public function drinkSizes()
+    {
+        return $this->hasMany(DrinkSize::class, 'drink_id', 'id');
+    }
     public function type()
     {
         return $this->belongsTo(Types::class);

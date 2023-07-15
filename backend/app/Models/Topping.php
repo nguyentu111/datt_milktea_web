@@ -10,7 +10,9 @@ class Topping extends Model
     use HasFactory;
     protected $table = 'toppings';
     protected $primaryKey   = 'id';
-
+    protected $casts = [
+        'amount' => 'float'
+    ];
     protected $fillable = [
         'material_id',
         'drink_id',

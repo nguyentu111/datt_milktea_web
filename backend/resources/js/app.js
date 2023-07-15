@@ -5,7 +5,6 @@ import "./products/create.js";
 import "./staffs/create.js";
 
 import Alpine from "alpinejs";
-import lodash from "lodash";
 import $ from "jquery";
 
 // Import flatpickr
@@ -82,4 +81,36 @@ flatpickr(".datepicker", {
     onChange: (selectedDates, dateStr, instance) => {
         instance.element.value = dateStr.replace("to", "-");
     },
+});
+
+$("input.decimal-only").on("keydown", function (event) {
+    if (event.shiftKey == true) {
+        event.preventDefault();
+    }
+    if (
+        (event.keyCode >= 48 && event.keyCode <= 57) ||
+        (event.keyCode >= 96 && event.keyCode <= 105) ||
+        event.keyCode == 8 ||
+        event.keyCode == 9 ||
+        event.keyCode == 37 ||
+        event.keyCode == 39 ||
+        event.keyCode == 46 ||
+        event.keyCode == 190
+    ) {
+    } else {
+        event.preventDefault();
+    }
+    if ($(this).val().indexOf(".") !== -1 && event.keyCode == 190)
+        event.preventDefault();
+});
+$("input.moneyformat").on("keyup", function (event) {
+    // skip for arrow keys
+    if (event.which >= 37 && event.which <= 40) return;
+    // format number
+    $(this).val(function (index, value) {
+        const rs = value
+            .replace(/\D/g, "")
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return rs;
+    });
 });

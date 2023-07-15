@@ -86,7 +86,7 @@ class SizeController extends Controller
      */
     public function destroy(Size $size)
     {
-        if ($size->products()->exists()) return redirect('/dashboard/sizes')->with('error', __('Uom has product cannot delete'));
+        if ($size->products()->exists()) return redirect('/dashboard/sizes')->with('error', __('Size has product cannot delete'));
         $size->delete();
         return redirect('/dashboard/sizes')->with('message', __('Size deleted successfully'));
     }

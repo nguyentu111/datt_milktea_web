@@ -16,6 +16,6 @@ class Size extends Model
     public $timestamps = false;
     public function products()
     {
-        return $this->hasMany(Product::class);
+        return $this->belongsToMany(Product::class, 'drink_sizes', 'size_id', 'drink_id');
     }
 }

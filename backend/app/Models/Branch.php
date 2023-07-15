@@ -19,9 +19,6 @@ class Branch extends Model
         'date_open',
         'active',
     ];
-
-    public $timestamps = false;
-
     public function products()
     {
         return $this->belongsToMany(Product::class, 'branch_materials', 'branch_id', 'material_id')
