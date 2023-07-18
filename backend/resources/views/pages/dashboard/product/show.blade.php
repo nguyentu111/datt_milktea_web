@@ -103,12 +103,12 @@
                                 <div class="pt-4">
                                     <div class="mt-2 flex gap-4">
                                         <div class="flex gap-2 items-center">
-                                            <input id="active" name="active" value="1" type='radio' checked />
+                                            <input id="active" name="active" value="1" type='radio' @if($product->active) checked @endif />
                                             <label for="active">Active</label>
                                         </div>
                                         <div class="flex gap-2 items-center">
-                                            <input id="unactive" name="active" value="0" type='radio' />
-                                            <label for="unactive">Unactive</label>
+                                            <input id="unactive" name="active" value="0" type='radio' @if(!$product->active) checked @endif />
+                                            <label for="unactive">Deactive</label>
                                         </div>
                                     </div>
                                     <x-input-error :messages="$errors->get('active')" class="mt-2 text-error" />
@@ -197,7 +197,7 @@
                             <span class="font-bold">ADD TOPPING</span>
                             <x-bewama::form.input.text name="search-topping" placeholder="Search toppings" class="w-full" />
                             <div class="grid grid-cols-3 gap-4">
-                                @foreach($materials as $topping)
+                                @foreach($toppings as $topping)
                                 <div class="relative topping-item" data-mat="{{$topping->id}}">
                                     <label for="topping-{{$topping->id}}">
                                         <div class=' cursor-pointer'>

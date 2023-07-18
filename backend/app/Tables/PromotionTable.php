@@ -42,9 +42,9 @@ class PromotionTable extends Table
             TextColumn::make('name')
                 ->label('Promotion name'),
             TextColumn::make('from_time')
-                ->label('From tme'),
+                ->label('From time'),
             TextColumn::make('to_time')
-                ->label('to_time'),
+                ->label('To time'),
             ActionColumn::make()
                 ->label('Action')
                 ->actions(

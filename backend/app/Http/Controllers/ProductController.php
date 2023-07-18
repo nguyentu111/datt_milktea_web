@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ProductCollection;
 use App\Models\DrinkSize;
 use App\Models\Product;
 use App\Models\ProductImPrice;
@@ -13,13 +14,16 @@ use App\Models\Topping;
 use App\Models\Type;
 use App\Models\Uom;
 use App\Tables\ProductTable;
+use App\Traits\ApiResponses;
 use Exception;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PhpParser\Node\Stmt\Foreach_;
 
 class ProductController extends Controller
 {
+    use ApiResponses;
     /**
      * Display a listing of the resource.
      */
@@ -35,15 +39,15 @@ class ProductController extends Controller
     {
         $materials = Product::query()->whereHas('type', function ($query) {
             $query->where('name', 'Materials');
-        })->where('active', '1')->get();
-        // $toppings = Product::query()->whereHas('type', function ($query) {
-        //     $query->where('name', 'Toppings');
-        // })->where('active', '1')->get();
+        })->get();
+        $toppings = Product::query()->whereHas('type', function ($query) {
+            $query->where('name', 'Toppings')->orWhere('name', 'Materials');
+        })->get();
         $taxs = Tax::all();
         $uoms = Uom::all();
         $types = Type::all();
         $sizes = Size::all();
-        return view("bewama::pages/dashboard/product/create", compact('materials', 'taxs', 'types', 'uoms', 'sizes'));
+        return view("bewama::pages/dashboard/product/create", compact('materials', 'taxs', 'types', 'uoms', 'sizes', 'toppings'));
     }
 
     /**
@@ -53,15 +57,15 @@ class ProductController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'unique:' . Product::class . ',name', 'string', 'max:50'],
-            'description' => ['sometimes', 'max:255'],
+            'description' => ['sometimes'],
             'tax_id' => ['required'],
             'uom_id' => ['required'],
             'type_id' => ['required'],
             'active' => ['required'],
             'sizes' => ['string'],
             'toppings' => ['string'],
-            'import_price' => ['string'],
-            'export_price' => ['string']
+            'import_price' => ['sometimes'],
+            'export_price' => ['sometimes']
         ]);
         $picture = null;
         if ($request->has('picture')) {
@@ -133,7 +137,7 @@ class ProductController extends Controller
             $query->where('name', 'Materials');
         })->where('active', '1')->get();
         $toppings = Product::query()->whereHas('type', function ($query) {
-            $query->where('name', 'Toppings');
+            $query->where('name', 'Toppings')->orWhere('name', 'Materials');
         })->where('active', '1')->get();
         $taxs = Tax::all();
         $uoms = Uom::all();
@@ -157,7 +161,7 @@ class ProductController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'unique:' . Product::class . ',name,' . $product->id, 'string', 'max:50'],
-            'description' => ['sometimes', 'max:255'],
+            'description' => ['sometimes'],
             'tax_id' => ['required'],
             'uom_id' => ['required'],
             'type_id' => ['required'],
@@ -238,5 +242,15 @@ class ProductController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function getDrinks()
+    {
+        $products = Product::query()->whereHas('type', fn ($q) => $q->where('name', 'Drinks'))
+            ->with(['type', 'uom', 'tax', 'sizes', 'availableToppings', 'tax', 'promotions' => function ($query) {
+                $query->where('from_time', '<=', date("Y-m-d H:i:s"))->where('to_time', '>', date("Y-m-d H:i:s"));
+            }])->where('active', true)->get();
+        // $products->each->append('currentExportPrice');
+        return $this->successCollectionResponse(new ProductCollection($products));
     }
 }

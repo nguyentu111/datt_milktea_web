@@ -1,24 +1,24 @@
 import classNames from "classnames";
-export default function DrinkSizeBtns({ value, setValue }) {
+export default function DrinkSizeBtns({ value, setValue, data }) {
   return (
     <div className="flex gap-3 pt-2">
-      {Array.from({ length: 3 }).map((item, index) => (
+      {data.map((size, index) => (
         <div
           className={classNames(
             "rounded cursor-pointer flex flex-col items-center  border-[1px] border-primary"
           )}
-          onClick={() => setValue(index)}
+          onClick={() => setValue(size)}
           key={index}
         >
           <span
             className={classNames(
-              value === index && "bg-primary text-white",
-              "min-w-[80px] py-1 text-center border-b-2   border-primary"
+              value?.id === size.id && "bg-primary text-white",
+              "min-w-[80px] w-full py-1 text-center border-b-2   border-primary"
             )}
           >
-            M
+            {size.name}
           </span>
-          <span>+2.00$</span>
+          <span className="px-2 text-[14px]">+{size.price} vnd</span>
         </div>
       ))}
     </div>

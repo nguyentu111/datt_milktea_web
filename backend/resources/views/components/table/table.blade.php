@@ -2,10 +2,10 @@
     <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
             @if($heading)
-                <h1 class="text-xl text-black uppercase font-bold dark:text-white">{{ __($heading) }}</h1>
+            <h1 class="text-xl text-black uppercase font-bold dark:text-white">{{ __($heading) }}</h1>
             @endif
             @if($description)
-                <p class="mt-4 text-sm text-slate-500 dark:text-slate-100">{{ __($description) }}</p>
+            <p class="mt-4 text-sm text-slate-500 dark:text-slate-100">{{ __($description) }}</p>
             @endif
         </div>
         <div>
@@ -20,34 +20,34 @@
                 <div class="overflow-hidden shadow ring-1 ring-black border-slate-200 border dark:border-white ring-opacity-5 sm:rounded-lg">
                     <table class="min-w-full divide-y divide-gray-300 ">
                         <thead class="bg-gray-50 dark:bg-transparent ">
-                        <tr>
-                            @foreach($columns as $column)
+                            <tr>
+                                @foreach($columns as $column)
                                 <th scope="col" class="px-3 dark:text-slate-100 uppercase py-3.5 text-left text-xs !font-semibold text-slate-700">
                                     {{ $column->getLabel() }}
                                 </th>
-                            @endforeach
-                        </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y dark:devide-white divide-gray-200 dark:bg-transparent">
-                        @forelse($rows as $model)
-                            <tr>
-                                @foreach($columns as $column)
-                                    @if($column instanceof \App\Tables\Columns\ActionColumn)
-                                        {!! $column->render($model) !!}
-                                    @else
-                                        <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap dark:bg-transparent dark:text-white">
-                                            @if($column->getUrl($model))
-                                                <a href="{{ $column->getUrl($model) }}" target="{{ $column->isOpenInNewTab() ? '_blank' : '_self' }}" class="transition-all hover:text-green-600">
-                                                    {!! $column->render($model) !!}
-                                                </a>
-                                            @else
-                                                {!! $column->render($model) !!}
-                                            @endif
-                                        </td>
-                                    @endif
                                 @endforeach
                             </tr>
-                        @empty
+                        </thead>
+                        <tbody class="bg-white divide-y dark:devide-white divide-gray-200 dark:bg-transparent">
+                            @forelse($rows as $model)
+                            <tr>
+                                @foreach($columns as $column)
+                                @if($column instanceof \App\Tables\Columns\ActionColumn)
+                                {!! $column->render($model) !!}
+                                @else
+                                <td class="max-w-[100px] truncate px-3 py-4 text-sm text-gray-500 whitespace-nowrap dark:bg-transparent dark:text-white">
+                                    @if($column->getUrl($model))
+                                    <a href="{{ $column->getUrl($model) }}" target="{{ $column->isOpenInNewTab() ? '_blank' : '_self' }}" class="transition-all hover:text-green-600">
+                                        {!! $column->render($model) !!}
+                                    </a>
+                                    @else
+                                    {!! $column->render($model) !!}
+                                    @endif
+                                </td>
+                                @endif
+                                @endforeach
+                            </tr>
+                            @empty
                             <tr>
                                 <td colspan="{{ count($columns) }}">
                                     <div class="py-6 text-center">
@@ -58,18 +58,18 @@
                                     </div>
                                 </td>
                             </tr>
-                        @endforelse
+                            @endforelse
                         </tbody>
                     </table>
 
                     @if($rows->hasPages())
-                        <div class="p-4">
-                            {{ $rows->links('bewama::components.table.partials.pagination') }}
-                        </div>
+                    <div class="p-4">
+                        {{ $rows->links('bewama::components.table.partials.pagination') }}
+                    </div>
                     @endif
 
                     @foreach($modals as $modal)
-                        {!! $modal !!}
+                    {!! $modal !!}
                     @endforeach
                 </div>
             </div>

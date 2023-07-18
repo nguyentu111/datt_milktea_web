@@ -1,24 +1,31 @@
 import classNames from "classnames";
-export default function ToppingBtns({ value, setValue }) {
+export default function ToppingBtns({ value, setValue, data }) {
+  const handleTopping = (topping) => {
+    const i = value.find((v) => v.id === topping.id);
+    if (i) {
+      setValue(value.filter((v) => v.id !== topping.id));
+    } else setValue((prev) => [...prev, topping]);
+  };
   return (
     <div className="flex gap-3 pt-2">
-      {Array.from({ length: 3 }).map((item, index) => (
+      {data.map((topping, index) => (
         <div
           className={classNames(
             " border-[1px] rounded cursor-pointer flex flex-col items-center border-primary"
           )}
-          onClick={() => setValue(index)}
-          key={index}
+          onClick={() => handleTopping(topping)}
+          key={topping.id}
         >
           <span
             className={classNames(
-              value === index && "bg-primary text-white  ",
-              "min-w-[80px] py-1 text-center  border-b-[1px] border-primary"
+              value.findIndex((v) => v.id === topping.id) > -1 &&
+                "bg-primary text-white  ",
+              "min-w-[80px] w-full py-1 text-center  border-b-[1px] border-primary"
             )}
           >
-            Cheery
+            {topping.name}
           </span>
-          <span>+2.00$</span>
+          <span className="px-2 text-[14px]">+{topping.price} vnd</span>
         </div>
       ))}
     </div>

@@ -3,29 +3,40 @@ import { SignupContext } from "../../contexts/SignupContext";
 import Modal from "./Modal";
 import { SigninContext } from "../../contexts/SigninContext";
 import toastr from "toastr";
+import { axiosClient } from "../../utils/request";
+import { useForm } from "react-hook-form";
+import { useMutation, useQueryClient } from "react-query";
 export default function SignupModel() {
   const [openSignup, setOpenSignup] = useContext(SignupContext);
-  // eslint-disable-next-line no-unused-vars
+  const { register, handleSubmit } = useForm();
   const [_, setOpenSignin] = useContext(SigninContext);
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const data = Array.from(e.target).reduce((acc, item) => ({
-      ...acc,
-      [item.name]: item.value,
-    }));
-
-    if (data.password !== data.confirm_password)
-      toastr.error("I do not think that word means what you think it means.");
-    data.first_name = data.value;
-    delete data[""];
-    delete data["value"];
-    delete data["confirm_password"];
-    console.log({ data });
+  const queryClient = useQueryClient();
+  const { mutate } = useMutation({
+    mutationFn: (data) => axiosClient.post("/auth/customer/register", data),
+    onError: (error) => {
+      if (error.response?.data?.error?.message) {
+        toastr.error(error.response?.data?.error?.message);
+      } else toastr.error("Something not right :<<");
+    },
+    onSuccess: (response) => {
+      toastr.success("Signup successfully");
+      setOpenSignup(false);
+      console.log(response.data.data);
+      queryClient.setQueryData("user", response.data.data.user);
+      queryClient.setQueryData("token", response.data.data.token);
+    },
+  });
+  const onSubmit = async (data) => {
+    if (data.password !== data.password_confirmation)
+      return toastr.error("Pass word confimation is not right !");
+    if (data.phone.length != 10)
+      return toastr.error("Phone must be 10 digits !");
+    mutate(data);
   };
   return (
     <Modal open={openSignup} onClickOutside={() => setOpenSignup(false)}>
       <div className="bg-secondary border-2 rounded flex shadow-xl fixed top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%] p-6">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <span className="pb-6 m-auto">Sign up</span>
           <div className="grid grid-cols-2 gap-4">
             <input
@@ -34,6 +45,7 @@ export default function SignupModel() {
               required
               placeholder="First name"
               className="px-2 py-1"
+              {...register("first_name")}
             />
             <input
               name="last_name"
@@ -41,6 +53,7 @@ export default function SignupModel() {
               required
               placeholder="Last name"
               className="px-2 py-1"
+              {...register("last_name")}
             />
             <input
               type="email"
@@ -48,6 +61,7 @@ export default function SignupModel() {
               required
               placeholder="Email"
               className="px-2 py-1"
+              {...register("email")}
             />
             <input
               type="text"
@@ -55,6 +69,7 @@ export default function SignupModel() {
               required
               placeholder="Phone"
               className="px-2 py-1"
+              {...register("phone")}
             />
             <input
               required
@@ -62,13 +77,14 @@ export default function SignupModel() {
               type="password"
               placeholder="Password"
               className="px-2 py-1"
+              {...register("password")}
             />
             <input
               required
-              name="confirm_password"
               type="password"
               placeholder="Password confirm"
               className="px-2 py-1"
+              {...register("password_confirmation")}
             />
           </div>
           <span>

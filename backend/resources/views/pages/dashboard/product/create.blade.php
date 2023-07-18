@@ -187,7 +187,7 @@
                             <span class="font-bold">ADD TOPPING</span>
                             <x-bewama::form.input.text name="search-topping" placeholder="Search toppings" class="w-full" />
                             <div class="grid grid-cols-3 gap-4">
-                                @foreach($materials as $topping)
+                                @foreach($toppings as $topping)
                                 <div class="relative topping-item">
                                     <label for="topping-{{$topping->id}}">
                                         <div class=' cursor-pointer'>

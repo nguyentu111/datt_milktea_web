@@ -34,7 +34,7 @@ trait CanBeFormatted
     {
         $this->formatStateUsing(
             fn (string|null $state): string|null
-            => $state ? number_format($state, 0) . '.000 vnd' : null
+            => $state ? $state . ' vnd' : null
         );
 
         return $this;

@@ -10,12 +10,13 @@ use App\Tables\Columns\TextColumn;
 use App\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 
 class ImportTable extends Table
 {
     protected string|null $heading = 'Import list';
 
-    protected string|null $description = 'List of all of import vouchers';
+    protected string|null $description = 'List of all of imports';
 
     protected function addRoute(): string
     {
@@ -40,7 +41,7 @@ class ImportTable extends Table
 
     protected function query(): Builder|HasMany
     {
-        return Import::query()->with('user')->with('customer');
+        return Import::query()->with(['staff', 'supplier', 'branchSource', 'branchDes'])->where('branch_des_id', Auth::user()->staff->branch->id);
     }
 
     protected function columns(): array
@@ -48,18 +49,15 @@ class ImportTable extends Table
         return [
             TextColumn::make('id')
                 ->label('Id'),
-            TextColumn::make('user')
+            TextColumn::make('staff')
+                ->withSub('full_name')
+                ->label('Staff'),
+            TextColumn::make('supplier')
                 ->withSub('name')
-                ->label('Created by'),
-            TextColumn::make('customer')
+                ->label('Supplier'),
+            TextColumn::make('branchSource')
                 ->withSub('name')
-                ->label('Customer'),
-            TextColumn::make('customer')
-                ->withSub('address')
-                ->label('Customer address'),
-            TextColumn::make('customer')
-                ->withSub('phone_number')
-                ->label('Customer phone number'),
+                ->label('Branch Source'),
             TextColumn::make('created_at')
                 ->label('Created at'),
             ActionColumn::make()
@@ -68,8 +66,6 @@ class ImportTable extends Table
                     LinkAction::make()
                         ->label('View')
                         ->url(fn (Import $import): string => route('imports.show', $import)),
-                    DeleteAction::make()
-                        ->url(fn (Import $import): string => route('imports.destroy', $import)),
                 ),
         ];
     }

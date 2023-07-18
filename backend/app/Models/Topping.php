@@ -21,13 +21,12 @@ class Topping extends Model
     ];
 
     public $timestamps = false;
-
-    public function drink()
+    public function product()
     {
-        return $this->belongsTo(Drink::class);
+        return $this->belongsTo(Product::class, 'material_id', 'id');
     }
-    public function material()
+    public function tax()
     {
-        return $this->belongsTo(Material::class);
+        return $this->product->tax();
     }
 }

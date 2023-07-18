@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useContext, useState } from "react";
 
 export const SigninContext = createContext();
 export function SigninContextProvider({ children }) {
@@ -10,3 +10,7 @@ export function SigninContextProvider({ children }) {
     </SigninContext.Provider>
   );
 }
+export const useSigninModel = function () {
+  const arr = useContext(SigninContext);
+  return arr;
+};

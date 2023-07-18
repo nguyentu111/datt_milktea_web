@@ -84,4 +84,8 @@ class Staff extends Model
 
         return  $exist;
     }
+    public function getFullNameAttribute()
+    {
+        return $this->getAttribute('first_name') . ' ' . $this->getAttribute('last_name');
+    }
 }

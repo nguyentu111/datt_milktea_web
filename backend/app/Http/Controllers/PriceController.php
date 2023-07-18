@@ -45,7 +45,7 @@ class PriceController extends Controller
             'is_import' => 'required',
         ]);
         $product = Product::find($data['product_id']);
-
+        $data['price'] = str_replace('.', '', $data['price']);
         // dd(strtotime($product->lastestExportApplyFrom) >= strtotime($data['apply_from']), $product->lastestExportApplyFrom,  $data['apply_from']);
         try {
             if ($data['is_import']) {

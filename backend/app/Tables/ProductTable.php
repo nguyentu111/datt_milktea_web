@@ -31,7 +31,7 @@ class ProductTable extends Table
 
     protected function query(): Builder|HasMany
     {
-        return Product::query()->with(['tax', 'type'])->orderBy('created_at');
+        return Product::query()->with(['tax', 'type'])->orderByDesc('created_at');
     }
 
     protected function addRoute(): string

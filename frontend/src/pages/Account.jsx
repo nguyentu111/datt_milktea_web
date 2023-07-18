@@ -4,10 +4,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
 import BreadCrumb from "../components/shared/BreadCrumb";
 import AddAddress from "../components/shared/AddAddress";
-
+import { useForm } from "react-hook-form";
+import { useQuery, useQueryClient } from "react-query";
+import { axiosClient } from "../utils/request";
+import useUserAddress from "../hooks/user/address";
 export default function Account() {
   const [tab, setTab] = useState(1);
-
+  const queryClient = useQueryClient();
+  const user = queryClient.getQueryData("user");
+  const { register, handleSubmit } = useForm();
+  const { isLoading, data } = useUserAddress();
+  const onSubmit = (data) => {
+    console.log(data);
+  };
   return (
     <div className="flex gap-4">
       <UserSideBar tab={tab} setTab={setTab} />
@@ -16,7 +25,10 @@ export default function Account() {
           <BreadCrumb data={[{ label: "Account" }]} />
         </div>
         {tab == 1 && (
-          <div className="bg-secondary rounded p-4">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="bg-secondary rounded p-4"
+          >
             <span className="font-bold text-[20px] mb-6 block">
               User infomation
             </span>
@@ -24,6 +36,8 @@ export default function Account() {
               <div className="flex flex-col text-left gap-2">
                 <label>Email</label>
                 <input
+                  readOnly
+                  value={user?.email}
                   disabled
                   placeholder="Email"
                   className="px-2 py-1 rounded disabled:bg-gray-100"
@@ -31,21 +45,33 @@ export default function Account() {
               </div>
               <div className="flex flex-col text-left gap-2">
                 <label>First name</label>
-                <input placeholder="First name" className="px-2 py-1 rounded" />
+                <input
+                  defaultValue={user?.first_name}
+                  placeholder="First name"
+                  className="px-2 py-1 rounded"
+                />
               </div>
               <div className="flex flex-col text-left gap-2">
                 <label>Last name</label>
-                <input placeholder="Last name" className="px-2 py-1 rounded" />
+                <input
+                  defaultValue={user?.last_name}
+                  placeholder="Last name"
+                  className="px-2 py-1 rounded"
+                />
               </div>
               <div className="flex flex-col text-left gap-2">
                 <label>Phone</label>
-                <input placeholder="Phone" className="px-2 py-1 rounded" />
+                <input
+                  defaultValue={user?.phone}
+                  placeholder="Phone"
+                  className="px-2 py-1 rounded"
+                />
               </div>
               <button className="form-btn py-2 rounded ml-auto col-span-2 mt-2">
                 Save changes
               </button>
             </form>
-          </div>
+          </form>
         )}
         {tab == 2 && (
           <>
@@ -54,26 +80,34 @@ export default function Account() {
                 User address list
               </span>
               <AddAddress />
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                {Array.from({ length: 3 }).map((val, index) => {
-                  return (
-                    <div
-                      key={index}
-                      className="flex p-4 rounded-sm border-2 border-primary"
-                    >
-                      <div className="">
-                        <span>address: </span>
-                        <span>
-                          97 man thien, hiep phu, quan 9phu, quan 9phu, quan 9
-                        </span>
+              {isLoading ? (
+                "loading..."
+              ) : (
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  {data.data.data.map((val, index) => {
+                    return (
+                      <div
+                        key={index}
+                        className="flex p-4 rounded-sm border-2 border-primary"
+                      >
+                        <div className="flex flex-col gap-4">
+                          <div className="">
+                            <span>address: </span>
+                            <span>{val.address}</span>
+                          </div>
+                          <div className="">
+                            <span>default : </span>
+                            <span>{val.is_default ? "yes" : "no"}</span>
+                          </div>
+                        </div>
+                        <button className="text-red-500 pl-1">
+                          <FontAwesomeIcon icon={faTrashCan} />
+                        </button>
                       </div>
-                      <button className="text-red-500 pl-1">
-                        <FontAwesomeIcon icon={faTrashCan} />
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </>
         )}

@@ -48,6 +48,13 @@ body {
   background-color: #c0aa83;
   color: white;
 }
+label {
+  user-select: none;
+}
+input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+}
 @layer base {
   /* body {
     @apply bg-[#141414] text-white !scrollbar-thin !scrollbar-track-transparent !scrollbar-thumb-red-600;

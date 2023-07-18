@@ -70,7 +70,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="p-4 col-span-2 h-[300px] border-2 rounded-md overflow-y-scroll ">
+                            <div class="p-4 col-span-2 h-[300px] border-2 rounded-md overflow-y-scroll">
                                 @foreach($products as $product)
                                 <label for="product-{{$product->id}}" class="cursor-pointer">
                                     <div class="flex items-center gap-4">

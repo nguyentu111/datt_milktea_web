@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Branch;
 use App\Tables\BranchTable;
+use App\Traits\ApiResponses;
 use Cloudinary\Cloudinary;
 use Illuminate\Http\RedirectResponse;
 
 class BranchController extends Controller
 {
+    use ApiResponses;
     /**
      * Display a listing of the resource.
      *
@@ -125,5 +127,10 @@ class BranchController extends Controller
         }
         $branch->delete();
         return redirect('/dashboard/branches')->with('message', __('Delete successfully'));;
+    }
+    public function getBranches()
+    {
+        $branches = Branch::query()->where('active', true)->get();
+        return $this->successCollectionResponse($branches);
     }
 }

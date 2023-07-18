@@ -119,7 +119,7 @@
                 if (p.drink_id == $(item).data('drink')) {
                     $(item).prop('checked', true);
                     $(item).next().next().next().show();
-                    $(item).next().next().next().val(p.promotion_amount ? p.promotion_amount + '.000' : null);
+                    $(item).next().next().next().val(p.promotion_amount ? p.promotion_amount + '' : null);
                 }
             })
         })
@@ -153,7 +153,7 @@
                 if (!$(item).is(':hidden')) {
                     drinks.push({
                         drink_id: $(item).data('drink'),
-                        promotion_amount: $(item).val()
+                        promotion_amount: $(item).val().replace('.', '')
 
                     })
                 }

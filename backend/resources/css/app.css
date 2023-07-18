@@ -3,18 +3,23 @@
 @tailwind utilities;
 
 /* Additional styles */
-@import 'additional-styles/utility-patterns.css';
-@import 'additional-styles/flatpickr.css';
+@import "additional-styles/utility-patterns.css";
+@import "additional-styles/flatpickr.css";
 @import "toastr";
-@import 'tailwindcss/utilities';
+@import "tailwindcss/utilities";
 
 /* See Alpine.js: https://github.com/alpinejs/alpine#x-cloak */
 [x-cloak=""] {
     display: none;
 }
 
-@media screen and (max-width: theme('screens.lg')) {
+@media screen and (max-width: theme("screens.lg")) {
     [x-cloak="lg"] {
         display: none;
     }
+}
+label,
+input[type="checkbox"],
+input[type="radio"] {
+    cursor: pointer;
 }

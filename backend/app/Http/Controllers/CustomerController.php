@@ -10,42 +10,38 @@ use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Address;
-use Illuminate\Support\Facades\DB; 
+use App\Traits\ApiResponses;
+use Illuminate\Support\Facades\DB;
 
 
 class CustomerController extends Controller
 {
+    use ApiResponses;
 
-    /**
-     * @OA\Get(
-     *      path="/api/admin/customers",
-     *      operationId="getProjectsList",
-     *      tags={"Projects"},
-     *      summary="Lấy danh sách khách hàng",
-     *      description="Trả về danh sách khách hàng đã phân trang",
-     *      @OA\Response(
-     *          response=200,
-     *          description="Successful operation",
-     *          @OA\JsonContent(
-     * 
-     * )
-     *       ),
-     *      @OA\Response(
-     *          response=401,
-     *          description="Unauthenticated",
-     *      ),
-     *      @OA\Response(
-     *          response=403,
-     *          description="Forbidden"
-     *      )
-     *     )
-     */
-
-    public function index()
+    public function addAddress(Request $request, $id)
     {
-        return new CustomerCollection(Customer::paginate(5));
+        $data = $request->validate([
+            'address' => ['string', 'required'],
+            'is_default' => ['sometimes', 'boolean']
+        ]);
+        if ($data['is_default']) {
+            $customerAddresses = Address::query()->where('customer_id', $id)->get();
+            $customerAddresses->each->update([
+                'is_default' => false
+            ]);
+        }
+        Address::create([
+            'customer_id' => $id,
+            'address' =>  $data['address'],
+            'is_default' =>  $data['is_default'],
+        ]);
+        return $this->successEntityResponse(null);
     }
-
+    public function getAddresses($id)
+    {
+        $customerAddresses = Address::query()->where('customer_id', $id)->get();
+        return $this->successCollectionResponse($customerAddresses);
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -56,7 +52,7 @@ class CustomerController extends Controller
         //
     }
 
-        /**
+    /**
      * @OA\Post(
      *      path="/projects",
      *      operationId="storeProject",
@@ -90,14 +86,13 @@ class CustomerController extends Controller
      */
     public function store(StoreCustomerRequest $request)
     {
-        try{
+        try {
             $new_cus = new CustomerResource(Customer::create($request->all()));
-        }
-        catch(Exception $e){
+        } catch (Exception $e) {
             return response()->json([
                 'status' => 'error',
                 'msg' => $e->getMessage(),
-            ],422);
+            ], 422);
         }
 
         return response()->json([
@@ -138,21 +133,20 @@ class CustomerController extends Controller
      */
     public function update(UpdateCustomerRequest $request, Customer $customer)
     {
-        try{
+        try {
             $customer1 =  $customer->update($request->all());
-        }
-        catch(Exception $e){
+        } catch (Exception $e) {
             return response()->json([
                 'status' => 'error',
                 'msg' => $e->getMessage(),
-            ],422);
+            ], 422);
         }
 
-        if(!$customer1){
+        if (!$customer1) {
             return response()->json([
                 'status' => 'error',
                 'msg' => 'Sửa thông tin khách hàng thất bại',
-            ],422);
+            ], 422);
         }
 
         return response()->json([
@@ -170,47 +164,47 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer)
     {
-        if($customer->orders()->get() !='[]'){
+        if ($customer->orders()->get() != '[]') {
             return response()->json([
                 'status' => 'error',
                 'msg' => "Khách hàng đã mua hàng không thể xóa."
-            ],400);
+            ], 400);
         }
 
-        DB::transaction(function () use ($customer){
+        DB::transaction(function () use ($customer) {
 
-            foreach($customer->addresses()->get() as $address){
+            foreach ($customer->addresses()->get() as $address) {
                 $address->delete();
             }
             $customer->delete();
         });
-        
+
         return response()->json([
             'status' => 'success',
             'msg' => "Xóa thông tin khách hàng thành công."
         ]);
     }
 
-    public function active($id){
+    public function active($id)
+    {
         $customer = Customer::find($id);
 
-        if($customer['active'] ==  true){
+        if ($customer['active'] ==  true) {
             return response()->json([
                 'status' => 'error',
                 'msg' => 'Khách hàng đang thiết lập hoạt động.',
-            ],422);
+            ], 422);
         }
 
         $customer['active'] = true;
-        
-        try{
+
+        try {
             $customer->update();
-        }
-        catch(Exception $e){
+        } catch (Exception $e) {
             return response()->json([
                 'status' => 'error',
                 'msg' => $e->getMessage(),
-            ],422);
+            ], 422);
         }
 
         return response()->json([
@@ -219,27 +213,27 @@ class CustomerController extends Controller
         ]);
     }
 
-    public function inActive($id){
+    public function inActive($id)
+    {
         $customer = Customer::find($id);
 
-        if($customer['active'] == false){
+        if ($customer['active'] == false) {
             return response()->json([
                 'status' => 'error',
                 'msg' => 'Nhân viên đang thiết lập ngưng hoạt động.',
-            ],422);
+            ], 422);
         }
 
         $customer['active'] = false;
         $customer->update();
 
-        try{
+        try {
             $customer->update();
-        }
-        catch(Exception $e){
+        } catch (Exception $e) {
             return response()->json([
                 'status' => 'error',
                 'msg' => $e->getMessage(),
-            ],422);
+            ], 422);
         }
 
         return response()->json([
@@ -248,33 +242,33 @@ class CustomerController extends Controller
         ]);
     }
 
-    public function addNewAddress($id, Request $request){
-    
+    public function addNewAddress($id, Request $request)
+    {
+
         $customer = Customer::find($id);
-        if($customer){
+        if ($customer) {
             $new_address = Address::create([
                 'address' => $request->address,
                 'customer_id' => int($id),
             ]);
 
-            if($new_address){
+            if ($new_address) {
                 return response()->json([
                     'status' => 'success',
                     'msg' => "Thêm địa chỉ mới thành công!",
                     'newAddress' => $new_address,
                 ]);
-            }
-            else{
+            } else {
                 return response()->json([
                     'status' => 'fail',
                     'msg' => "Thêm địa chỉ mới thất bại!",
-                ],422);
+                ], 422);
             }
-        }else{
+        } else {
             return response()->json([
                 'status' => 'fail',
                 'msg' => "Khách hàng không tồn tại!",
-            ],422);
+            ], 422);
         }
     }
 }

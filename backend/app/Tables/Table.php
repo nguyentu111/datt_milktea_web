@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 abstract class Table
 {
-    protected int $perPage = 15;
+    protected int $perPage = 10;
 
     protected string|null $heading = null;
 

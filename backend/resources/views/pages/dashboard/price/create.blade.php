@@ -69,7 +69,7 @@
                                 <div class="mt-2 flex gap-4">
                                     <div class="flex gap-2 items-center">
                                         <input id="import" name="is_import" value="1" type='radio' checked />
-                                        <label for="is_import">Import price</label>
+                                        <label for="import">Import price</label>
                                     </div>
                                     <div class="flex gap-2 items-center">
                                         <input id="export" name="is_import" value="0" type='radio' />
@@ -112,7 +112,7 @@
                 $('.import-table-body').append(
                     `<tr>
                    <td class="p-2 border-2">
-                        ${p.price}.000vnd
+                        ${p.price} vnd
                     </td>
                     <td class="p-2 border-2">
                         ${p.apply_from}
@@ -126,7 +126,7 @@
                 $('.export-table-body').append(
                     `<tr>
                    <td class="p-2 border-2">
-                        ${p.price}.000vnd
+                        ${p.price} vnd
                     </td>
                     <td class="p-2 border-2">
                         ${p.apply_from}

@@ -8,9 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class ProductExPrice extends Model
 {
     use HasFactory;
-    protected $casts = [
-        'price' => 'float'
-    ];
     protected $fillable = [
         'product_id',
         'price',
