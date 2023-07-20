@@ -3,8 +3,11 @@
 use App\Http\Controllers\Branch\BranchController;
 use App\Http\Controllers\Branch\SearchBranchController;
 use App\Http\Controllers\BranchMaterialController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\Order\OrderController;
+use App\Http\Controllers\Order\OrderStatusController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PriceController;
@@ -46,11 +49,14 @@ Route::prefix('dashboard')->group(function () {
 
         Route::resource('suppliers', SupplierController::class);
         Route::resource('imports', ImportController::class);
+        Route::resource('orders', OrderController::class);
 
         Route::resource('sizes', SizeController::class);
         Route::resource('types', TypeController::class);
+        Route::resource('categories', CategoryController::class);
         Route::resource('uoms', UomController::class);
         Route::resource('branches', BranchController::class);
         Route::get('search-branch', [SearchBranchController::class, '__invoke']);
+        Route::post('update-order-status', [OrderStatusController::class, '__invoke']);
     });
 });

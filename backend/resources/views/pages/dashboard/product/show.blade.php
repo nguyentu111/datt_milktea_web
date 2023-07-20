@@ -83,20 +83,25 @@
                                 </x-bewama::form.input.select>
                             </div>
                             <div class="pt-4">
-                                <label for="type" class="block  text-sm font-medium leading-6 text-gray-900">{{ __('Type') }}</label>
-                                <x-bewama::form.input.select name="type_id">
-                                    @foreach($types as $type)
-                                    <option value="{{ $type->id }}" @if(old('type_id')) @if(old('type_id')==$type->id)
-                                        selected
-                                        @endif
-                                        @else
-                                        @if($product->type_id == $type->id)
-                                        selected
-                                        @endif
-                                        @endif
-                                        >{{$type->name}}</option>
+                                <label for="category_id" class="block  text-sm font-medium leading-6 text-gray-900">{{ __('Category') }}</label>
+                                <x-bewama::form.input.select name="category_id">
+                                    <option value="" checked>-- none --</option>
+                                    @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" @if(old('category_id')==$category->id) selected @endif>{{$category->name}}</option>
                                     @endforeach
                                 </x-bewama::form.input.select>
+                            </div>
+                            <div class="pt-4">
+                                <label for="type" class="block  text-sm font-medium leading-6 text-gray-900">{{ __('Type') }}</label>
+                                <div class="flex gap-6 ml-4">
+                                    @foreach($types as $type)
+                                    <div>
+                                        <input type="checkbox" id="type-{{$type->id}}" data-id="{{$type->id}}" name="type-{{$type->id}}" class="type" @if($product->isType($type->type)) checked @endif />
+                                        <label for="type-{{$type->id}}">{{$type->type}}</label>
+                                    </div>
+                                    @endforeach
+                                </div>
+
                             </div>
 
                             <div class="flex justify-between">
@@ -460,11 +465,16 @@
                                         [item.name]: item.value
                                     }
                                 }, {})
-                                console.log(data);
-                                if (data.sizes && data.toppings) return;
+                                if (data.sizes && data.toppings && data.types) return;
                                 e.preventDefault();
                                 const sizes = [];
                                 const toppings = [];
+                                const types = [];
+                                $('.type').each(function(i, elem) {
+                                    if (elem.checked) {
+                                        types.push($(elem).data('id'));
+                                    }
+                                });
                                 $('.size-section').toArray().forEach(item => {
 
                                     if (!$(item).is(':hidden')) {
@@ -509,8 +519,12 @@
                                 var input2 = $("<input>")
                                     .attr("type", "hidden")
                                     .attr("name", "toppings").val(JSON.stringify(toppings));
+                                var input3 = $("<input>")
+                                    .attr("type", "hidden")
+                                    .attr("name", "types").val(JSON.stringify(types));
                                 form.append(input1);
                                 form.append(input2);
+                                form.append(input3);
                                 form.submit();
 
                             })

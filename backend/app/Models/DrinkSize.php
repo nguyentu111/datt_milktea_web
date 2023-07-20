@@ -30,8 +30,12 @@ class DrinkSize extends Model
     {
         return $this->hasMany(Recipe::class);
     }
-    public function sizes()
+    public function size()
     {
         return $this->belongsTo(Size::class);
+    }
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'drink_id', 'id');
     }
 }

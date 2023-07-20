@@ -9,28 +9,20 @@ class OrderDetail extends Model
 {
     use HasFactory;
     protected $table = 'order_details';
-    protected $primaryKey   = ['drink_detail_id', 'order_id'];
-
     protected $fillable = [
-        'drink_detail_id',
+        'drink_size_id',
         'order_id',
-        'regular_price',
-        'promotion_price',
+        'regular_amount',
+        'promotion_amount',
     ];
 
     public $timestamps = false;
-
-
-    protected $casts = [
-        'topping_list' => 'array'
-    ];
-    public function drink()
+    public function toppings()
     {
-        return $this->hasOneThrough(Drink::class, DrinkSize::class);
+        return $this->belongsToMany(Topping::class, 'order_toppings', 'order_detail_id', 'topping_id');
     }
-    public function orderToppings()
+    public function drinkSize()
     {
-        return $this->belongsToMany(Topping::class, 'order_toppings', 'order_detail_id', 'topping_id')
-            ->withPivot('price');
+        return $this->belongsTo(DrinkSize::class);
     }
 }

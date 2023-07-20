@@ -17,8 +17,8 @@ class Recipe extends Model
         'amount'
     ];
 
-    public function materials()
+    public function material()
     {
-        return $this->hasMany(Product::class, 'id', 'material_id');
+        return $this->belongsTo(Product::class, 'material_id', 'id');
     }
 }

@@ -40,7 +40,7 @@
                                         <div class="flex items-center gap-4">
                                             <input type="checkbox" id="product-{{$product->id}}" class="product-checkbox" />
                                             <img src="{{$product->picture ?? asset('assets/images/img-placeholder.png')  }}" class="w-20 h-20 object-contain" />
-                                            <span class="max-w-[400px] min-w-[200px] truncate">{{$product->name}}</span>
+                                            <span class="max-w-[400px] min-w-[200px] truncate">{{$product->name}} ({{$product->uom->name}})</span>
                                             <x-bewama::form.input.text data-product="{{$product->id}}" name="amount-{{$product->id}}" placeholder="amount" class="max-w-[200px] decimal-only moneyformat hidden amount" />
                                         </div>
                                     </label>
@@ -122,7 +122,7 @@
                 if (!$(item).is(':hidden')) {
                     products.push({
                         material_id: $(item).data('product'),
-                        amount: $(item).val()
+                        amount: $(item).val().replace('.', '')
 
                     })
                 }

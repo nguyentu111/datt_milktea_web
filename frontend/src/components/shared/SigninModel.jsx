@@ -5,28 +5,29 @@ import { SignupContext } from "../../contexts/SignupContext";
 import { axiosClient } from "../../utils/request";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
-import { useLocalStorage } from "usehooks-ts";
 import toastr from "toastr";
+import { useSelector } from "react-redux";
+import { useLogin } from "../../redux/auth";
 export default function SigninModel() {
   const queryClient = useQueryClient();
   const [openSignin, setOpenSignin] = useContext(SigninContext);
   // eslint-disable-next-line no-unused-vars
   const [____, setOpenSignup] = useContext(SignupContext);
   // eslint-disable-next-line no-unused-vars
-  const [__, setCurrentUser] = useLocalStorage("currentUser");
   const { register, handleSubmit } = useForm();
-  const [token, setToken] = useLocalStorage("token");
+  const login = useLogin();
+  const auth = useSelector((state) => state.user);
+  console.log({ auth });
   const { mutate: mutateSignin } = useMutation({
     mutationFn: (data) =>
       axiosClient.post("auth/customer/login", data, {
         headers: {
-          Authorization: "Bearer " + token,
+          Authorization: "Bearer " + auth.token,
         },
       }),
     onSuccess: (response) => {
       toastr.success("Login successfully");
-      queryClient.setQueryData("user", response.data.data.user);
-      queryClient.setQueryData("token", response.data.data.token);
+      login({ user: response.data.data.user, token: response.data.data.token });
       setOpenSignin(false);
     },
     onError: () => {

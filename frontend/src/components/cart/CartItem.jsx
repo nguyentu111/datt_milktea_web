@@ -7,7 +7,7 @@ export default function CartItem({ data }) {
   const totalPrice =
     ((data.drink.promotion_amount ?? data.drink.regular_amount) +
       data.toppings.reduce((acc, v) => acc + v.price, 0) +
-      data.size.price) *
+      (data.size?.price ?? 0)) *
     data.quantity;
   return (
     <div className="flex gap-2 p-2">
@@ -20,10 +20,12 @@ export default function CartItem({ data }) {
           {data.drink.name}
         </span>
         <div className="text-[13px]">
-          <div>
-            <span className="">Size : </span>
-            <span className="">{data.size.name}</span>
-          </div>
+          {data.size && (
+            <div>
+              <span className="">Size : </span>
+              <span className="">{data.size.name}</span>
+            </div>
+          )}
           <div>
             {data.toppings.length > 0 && <span className="">Toppings : </span>}
             {data.toppings.map((t, i) => {

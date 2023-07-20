@@ -41,7 +41,9 @@ class ImportTable extends Table
 
     protected function query(): Builder|HasMany
     {
-        return Import::query()->with(['staff', 'supplier', 'branchSource', 'branchDes'])->where('branch_des_id', Auth::user()->staff->branch->id);
+        return Import::query()->with(['staff', 'supplier', 'branchSource', 'branchDes'])
+            ->where('branch_des_id', Auth::user()->staff->branch->id)
+            ->orderByDesc('created_at');
     }
 
     protected function columns(): array

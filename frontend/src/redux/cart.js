@@ -13,14 +13,14 @@ export const cartSlide = createSlice({
       const item = currentState.data.find(
         (v) =>
           v.drink.id === action.payload.drink.id &&
-          v.size.id === action.payload.size.id &&
+          v.size?.id === action.payload.size?.id &&
           JSON.stringify(v.toppings) === JSON.stringify(action.payload.toppings)
       );
       if (item) {
         const index = currentState.data.findIndex(
           (v) =>
             v.drink.id === action.payload.drink.id &&
-            v.size.id === action.payload.size.id &&
+            v.size?.id === action.payload.size?.id &&
             JSON.stringify(v.toppings) ===
               JSON.stringify(action.payload.toppings)
         );
@@ -41,7 +41,7 @@ export const cartSlide = createSlice({
       const index = currentState.data.findIndex(
         (v) =>
           v.drink.id === action.payload.drink.id &&
-          v.size.id === action.payload.size.id &&
+          v.size?.id === action.payload.size?.id &&
           JSON.stringify(v.toppings) === JSON.stringify(action.payload.toppings)
       );
       state.data.splice(index, 1);

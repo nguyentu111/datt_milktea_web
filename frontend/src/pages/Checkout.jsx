@@ -5,7 +5,9 @@ import useUserAddress from "../hooks/user/address";
 import classNames from "classnames";
 import { useGetAllBranch } from "../hooks/branch/branch";
 import { useSelector } from "react-redux";
-
+import useCheckOut from "../hooks/checkout/checkout";
+import toastr from "toastr";
+import { useNavigate } from "react-router-dom";
 const shipFee = Math.round(Math.random() * 20) * 1000;
 export default function Checkout() {
   const [openStoreModel, setOpenStoreModel] = useState(false);
@@ -15,9 +17,20 @@ export default function Checkout() {
   const [branch, setBranch] = useState(null);
   const [paymentType, setPaymentType] = useState("cash");
   const cart = useSelector((state) => state.cart.data);
-  // const shippingFee = Math.round(Math.random() * 20) * 1000;
   const [note, setNote] = useState(null);
-
+  const nav = useNavigate();
+  const { mutate } = useCheckOut({
+    onSuccess: (response) => {
+      toastr.success("Check out successfully");
+      nav("/");
+    },
+    onError: (error) => {
+      console.log(error);
+      if (error.response.status == 401) {
+        toastr.error("unauthenticate");
+      } else toastr.error("Failed");
+    },
+  });
   const tax = cart.reduce((acc, val) => {
     const taxToppings = val.toppings.reduce(
       (acc, val) => acc + val.price * val.tax,
@@ -35,13 +48,25 @@ export default function Checkout() {
         acc +
         ((v.drink.promotion_amount ?? v.drink.regular_amount) +
           v.toppings.reduce((acc, v) => acc + v.price, 0) +
-          v.size.price) *
+          (v.size?.price ?? 0)) *
           v.quantity
       );
     }, 0) +
     tax +
     shipFee;
-  const handleCheckout = () => {};
+  const handleCheckout = () => {
+    const data = {
+      tax_amount: tax,
+      ship_note: note,
+      ship_amount: shipFee,
+      ship_to: address?.address,
+      total_amount: total,
+      is_paid: paymentType == "cash" ? true : false,
+      payment_type: paymentType,
+      branch_id: branch.id,
+    };
+    mutate({ items: cart, ...data });
+  };
 
   useEffect(() => {
     if (data && address == null) {

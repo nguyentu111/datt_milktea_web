@@ -25,7 +25,7 @@ class Product extends Model
         'picture',
         'tax_id',
         'uom_id',
-        'type_id',
+        'category_id',
         'active',
     ];
 
@@ -51,9 +51,13 @@ class Product extends Model
     {
         return $this->hasMany(DrinkSize::class, 'drink_id', 'id');
     }
-    public function type()
+    public function category()
     {
-        return $this->belongsTo(Types::class);
+        return $this->belongsTo(Category::class);
+    }
+    public function types()
+    {
+        return $this->belongsToMany(Type::class, 'product_types', 'product_id', 'type_id');
     }
     public function promotions()
     {
@@ -99,6 +103,10 @@ class Product extends Model
     public function exportPrices()
     {
         return $this->hasMany(ProductExPrice::class);
+    }
+    public function isType($name)
+    {
+        return $this->types()->where('type', $name)->exists();
     }
     // public function getCurrentPromotionAttribute(): Attribute
     // {

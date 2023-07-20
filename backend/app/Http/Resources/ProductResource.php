@@ -27,6 +27,7 @@ class ProductResource extends JsonResource
             'promotion_amount' => $this->currentPromotionPrice(),
             'picture' => $this->picture,
             'slug' => $this->slug,
+            'recipes' => $this->recipes
         ];
     }
 }

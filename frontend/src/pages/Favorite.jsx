@@ -7,6 +7,7 @@ export default function Favorite() {
         <BreadCrumb data={[{ label: "Favorite" }]} />
       </div>
       <div className="grid grid-cols-4 gap-4">
+        {/* <ProductCard />
         <ProductCard />
         <ProductCard />
         <ProductCard />
@@ -19,8 +20,7 @@ export default function Favorite() {
         <ProductCard />
         <ProductCard />
         <ProductCard />
-        <ProductCard />
-        <ProductCard />
+        <ProductCard /> */}
       </div>
     </div>
   );

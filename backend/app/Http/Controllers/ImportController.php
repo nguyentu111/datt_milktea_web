@@ -46,6 +46,7 @@ class ImportController extends Controller
             'supplier_id' => ['sometimes'],
             'products' => 'string'
         ]);
+
         try {
             DB::beginTransaction();
             $import = Import::create([
@@ -67,14 +68,11 @@ class ImportController extends Controller
                         'material_id' =>  $product->material_id,
                     ])->first();
                     if ($branchSourceMaterial) {
-                        $branchSourceMaterial->amount =  floatval($product->amount) + floatval($branchSourceMaterial->amount);
+                        $branchSourceMaterial->amount = floatval($branchSourceMaterial->amount) -  floatval($product->amount);
+                        if ($branchSourceMaterial->amount < 0) return back()->withInput()->with('error', __('Branch not enought material '));
                         $branchSourceMaterial->save();
                     } else {
-                        BranchMaterial::create([
-                            'branch_id' =>  $data['branch_id'],
-                            'material_id' =>  $product->material_id,
-                            'amount' => $product->amount
-                        ]);
+                        return back()->withInput()->with('error', __('Branch not enought material '));
                     }
                 }
                 $branchDesMaterial = BranchMaterial::where([
@@ -87,21 +85,12 @@ class ImportController extends Controller
                     $branchDesMaterial->save();
                 } else {
                     $branch = Branch::query()->find(Auth::user()->staff->branch->id);
-                    // BranchMaterial::create([
-                    //     'branch_id' => Auth::user()->staff->branch->id,
-                    //     'material_id' =>  $product->material_id,
-                    //     'amount' => $product->amount
-                    // ]);
                     $branch->products()->attach([
                         [
                             'material_id' =>  $product->material_id,
                             'amount' => $product->amount
                         ]
                     ]);
-                    // Auth::user()->staff->branch->products()->attach([
-                    //     'material_id' =>  $product->material_id,
-                    //     'amount' => $product->amount
-                    // ]);
                 }
             }
 

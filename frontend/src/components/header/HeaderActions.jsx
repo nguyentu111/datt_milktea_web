@@ -8,17 +8,16 @@ import SigninModel from "../shared/SigninModel";
 import { SigninContext } from "../../contexts/SigninContext";
 import { SignupContext } from "../../contexts/SignupContext";
 import SignupModel from "../shared/SignupModel";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation } from "react-query";
 import { axiosClient } from "../../utils/request";
 import toastr from "toastr";
+import { useSelector } from "react-redux";
+import { useLogout } from "../../redux/auth";
 export default function HeaderActions() {
   const [openSignin, setOpenSignin] = useContext(SigninContext);
   const [openSignup, setOpenSignup] = useContext(SignupContext);
-  const queryClient = useQueryClient();
-
-  const user = queryClient.getQueryData("user");
-
-  const token = queryClient.getQueryData("token");
+  const { user, token } = useSelector((state) => state.user);
+  const logout = useLogout();
   const { mutate: mutateLogout } = useMutation({
     mutationFn: () =>
       axiosClient.post("auth/customer/logout", null, {
@@ -27,9 +26,8 @@ export default function HeaderActions() {
         },
       }),
     onSuccess: () => {
+      logout();
       toastr.success("Logout successfully");
-      queryClient.setQueryData("user", null);
-      queryClient.setQueryData("token", null);
     },
   });
 

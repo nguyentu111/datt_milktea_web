@@ -31,7 +31,7 @@ class ProductTable extends Table
 
     protected function query(): Builder|HasMany
     {
-        return Product::query()->with(['tax', 'type'])->orderByDesc('created_at');
+        return Product::query()->with(['tax', 'category'])->orderByDesc('created_at');
     }
 
     protected function addRoute(): string
@@ -59,9 +59,9 @@ class ProductTable extends Table
             TextColumn::make('uom')
                 ->withSub('name')
                 ->label('Uom'),
-            TextColumn::make('type')
+            TextColumn::make('category')
                 ->withSub('name')
-                ->label('Type'),
+                ->label('Category'),
             TextColumn::make('active')
                 ->castBool()
                 ->label('Is active'),

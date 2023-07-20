@@ -3,4 +3,4 @@
 
         {{ $categoryTable->render() }}
     </div>
-</x-app-layout> 
+</x-app-layout>

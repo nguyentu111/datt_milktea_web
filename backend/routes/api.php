@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthCustomerController;
 use App\Http\Controllers\Branch\BranchController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\OrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('auth/customer/logout', [AuthCustomerController::class, 'logout']);
     Route::get('customer/{id}/addresses', [CustomerController::class, 'getAddresses']);
     Route::post('customer/{id}/addresses/add', [CustomerController::class, 'addAddress']);
+    Route::post('customer/checkout', [OrderController::class, 'orderOnWeb']);
 });
 
 Route::get('/drinks', [ProductController::class, 'getDrinks']);

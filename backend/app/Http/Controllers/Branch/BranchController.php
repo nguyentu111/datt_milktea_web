@@ -130,7 +130,7 @@ class BranchController extends Controller
     }
     public function getBranches()
     {
-        $branches = Branch::query()->where('active', true)->get();
+        $branches = Branch::query()->with(['products'])->where('active', true)->get();
         return $this->successCollectionResponse($branches);
     }
 }

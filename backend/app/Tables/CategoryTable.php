@@ -23,15 +23,13 @@ class CategoryTable extends Table
         return [
             'id',
             'name',
-            'unit',
-            'created_at',
-            'updated_at',
+            'parent_id'
         ];
     }
 
     protected function query(): Builder|HasMany
     {
-        return Category::query()->select($this->selectedColumns());
+        return Category::with('parentCategory');
     }
 
     protected function addRoute(): string
@@ -51,12 +49,9 @@ class CategoryTable extends Table
                 ->label('Id'),
             TextColumn::make('name')
                 ->label('Name'),
-            TextColumn::make('unit')
-                ->label('Email'),
-            TextColumn::make('created_at')
-                ->label('Created at'),
-            TextColumn::make('updated_at')
-                ->label('Updated at'),
+            TextColumn::make('parentCategory')
+                ->withSub('name')
+                ->label('Parent category'),
             ActionColumn::make()
                 ->label('Action')
                 ->actions(

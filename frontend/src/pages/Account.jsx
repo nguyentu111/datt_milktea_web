@@ -5,13 +5,11 @@ import { faTrashCan } from "@fortawesome/free-regular-svg-icons";
 import BreadCrumb from "../components/shared/BreadCrumb";
 import AddAddress from "../components/shared/AddAddress";
 import { useForm } from "react-hook-form";
-import { useQuery, useQueryClient } from "react-query";
-import { axiosClient } from "../utils/request";
 import useUserAddress from "../hooks/user/address";
+import { useSelector } from "react-redux";
 export default function Account() {
   const [tab, setTab] = useState(1);
-  const queryClient = useQueryClient();
-  const user = queryClient.getQueryData("user");
+  const { user } = useSelector((state) => state.user);
   const { register, handleSubmit } = useForm();
   const { isLoading, data } = useUserAddress();
   const onSubmit = (data) => {

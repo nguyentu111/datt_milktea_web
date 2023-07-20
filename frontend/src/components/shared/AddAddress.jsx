@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { axiosClient } from "../../utils/request";
 import { useMutation, useQueryClient } from "react-query";
 import toastr from "toastr";
+import { useSelector } from "react-redux";
 export default function AddAddress() {
   const [openAdressModel, setOpenAdressModel] = useState(false);
 
@@ -15,8 +16,9 @@ export default function AddAddress() {
   // const [wardChoosed, setWardChoosed] = useState(null);
   const { register, handleSubmit } = useForm();
   const queryClient = useQueryClient();
-  const user = queryClient.getQueryData("user");
-  const token = queryClient.getQueryData("token");
+  // const user = queryClient.getQueryData("user");
+  // const token = queryClient.getQueryData("token");
+  const { user, token } = useSelector((state) => state.user);
   const {
     mutate,
     data: mutateData,

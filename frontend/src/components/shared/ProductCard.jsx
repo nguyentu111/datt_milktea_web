@@ -17,7 +17,7 @@ export default function ProductCard({ data }) {
   const [drinks, setDrinks] = useLocalStorage("cart-drinks", []);
   const add = useAddToCart();
   const [total, setTotal] = useState(
-    (data.promotion_amount ?? data.regular_amount) + data.sizes[0].price
+    (data.promotion_amount ?? data.regular_amount) + data.sizes[0]?.price
   );
 
   const handleLikeBtn = (e) => {
@@ -44,14 +44,17 @@ export default function ProductCard({ data }) {
     <>
       <div
         onClick={() => setOpenModel(true)}
-        className="border-[1px] rounded group cursor-pointer hover:shadow-lg"
+        className="border-[1px] rounded group cursor-pointer hover:shadow-lg flex flex-col"
       >
         <div className="relative">
           <img className="w-full aspect-square" src={data.picture} />
           <AddToFavovite />
         </div>
-        <div className="p-3 flex flex-col gap-2">
-          <span>{data.name}</span>
+        <div
+          className="p-3 flex flex-col gap-2 "
+          style={{ height: "-webkit-fill-available" }}
+        >
+          <span className="line-clamp-2">{data.name}</span>
           <div className="flex gap-2">
             {data.promotion_amount ? (
               <>
@@ -66,13 +69,16 @@ export default function ProductCard({ data }) {
               </span>
             )}
           </div>
-          <button className="bg-secondary group-hover:bg-primary group-hover:text-white add-product-btn rounded py-2">
+          <button className="mt-auto bg-secondary group-hover:bg-primary group-hover:text-white add-product-btn rounded py-2">
             Add to cart
           </button>
         </div>
       </div>
       <Modal open={openModal} onClickOutside={() => setOpenModel(false)}>
-        <div className="bg-secondary border-2 rounded flex shadow-xl fixed top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]">
+        <div
+          className="bg-secondary border-2 rounded flex shadow-xl fixed top-[50%] 
+        left-[50%] -translate-x-[50%] -translate-y-[50%] min-w-[600px] min-h-[400px]"
+        >
           <div className="relative p-4">
             <img className="w-60 aspect-square" src={data.picture} />
             <AddToFavovite className="top-6 right-6" />
@@ -109,12 +115,16 @@ export default function ProductCard({ data }) {
               />
             </div>
             <div>
-              <span>Choose size : </span>
-              <DrinkSizeBtns
-                value={size}
-                setValue={setSize}
-                data={data.sizes}
-              />
+              {data.sizes.length > 0 && (
+                <>
+                  <span>Choose size : </span>
+                  <DrinkSizeBtns
+                    value={size}
+                    setValue={setSize}
+                    data={data.sizes}
+                  />
+                </>
+              )}
             </div>
             <div>
               {data.toppings.length > 0 && (
@@ -130,7 +140,7 @@ export default function ProductCard({ data }) {
             </div>
             <button
               onClick={handleAddCart}
-              className=" add-product-btn bg-primary mt-2 hover:text-white rounded py-2 "
+              className=" add-product-btn bg-primary mt-2 hover:text-white rounded py-2 px-3 mt-auto"
             >
               <FontAwesomeIcon icon={faCartPlus} className="pr-3" />
               Add to cart : <span>{total} vnd</span>

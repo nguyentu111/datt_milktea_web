@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Type;
+use App\Tables\CategoryTable;
 use App\Tables\TypeTable;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
-class TypeController extends Controller
+class CategoryController extends Controller
 {
 
     /**
      * Display a listing of the resource.
      */
-    public function index(TypeTable $typeTable)
+    public function index(CategoryTable $categoryTable)
     {
-        return view('bewama::pages/dashboard/type/index', compact('typeTable'));
+        return view('bewama::pages/dashboard/category/index', compact('categoryTable'));
     }
 
     /**
@@ -24,7 +25,8 @@ class TypeController extends Controller
     public function create()
     {
         // $types = Type::query()->whereNot('name', 'Toppings')->whereNot('name', 'Materials')->get();
-        // return view('bewama::pages/dashboard/type/create', compact('types'));
+        $categories = Category::all();
+        return view('bewama::pages/dashboard/category/create', compact('categories'));
     }
 
     /**
@@ -34,7 +36,7 @@ class TypeController extends Controller
     {
 
         $data = $request->validate([
-            'name' => ['required', 'max:50', 'unique:types,name'],
+            'name' => ['required', 'max:50', 'unique:categories,name'],
             'parent_id' => ['sometimes'],
         ]);
 
@@ -42,21 +44,21 @@ class TypeController extends Controller
         if ($request->has('picture')) {
             $picture = cloudinary()->upload($request->file('picture')->getRealPath())->getSecurePath();
         }
-        Type::create([
+        Category::create([
             'name' => $data['name'],
             'parent_id' => $data['parent_id'] ?? null,
             'picture' => $picture
         ]);
-        return redirect('/dashboard/types')->with('message', 'Type created successfully');
+        return redirect('/dashboard/categories')->with('message', 'Category created successfully');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Type $type)
+    public function show(Category $category)
     {
-        // $types = Type::all();
-        // return view('bewama::pages/dashboard/type/show', compact('types', 'type'));
+        $categories = Category::all();
+        return view('bewama::pages/dashboard/category/show', compact('categories', 'category'));
     }
 
     /**
@@ -70,38 +72,38 @@ class TypeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Type $type)
+    public function update(Request $request, Category $category)
     {
         $data = $request->validate([
-            'name' => ['required', 'max:50', 'unique:types,name,' . $type->id],
+            'name' => ['required', 'max:50', 'unique:categories,name,' . $category->id],
             'parent_id' => ['sometimes'],
 
         ]);
 
-        $picture = $type->picture;
+        $picture = $category->picture;
         if ($request->has('picture')) {
             $picture = cloudinary()->upload($request->file('picture')->getRealPath())->getSecurePath();
         }
-        $type->update([
+        $category->update([
             'name' => $data['name'],
             'parent_id' => $data['parent_id'] ?? null,
             'picture' => $picture
         ]);
-        return redirect('/dashboard/types')->with('message', 'Type updated successfully');
+        return redirect('/dashboard/categories')->with('message', 'category updated successfully');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Type $type)
+    public function destroy(Category $category)
     {
-        if ($type->products()->exists()) {
-            return back()->with(['error' => 'Type has products cannot delete']);
+        if ($category->products()->exists()) {
+            return back()->with(['error' => 'category has products cannot delete']);
         }
-        if ($type->childrenType()->exists()) {
-            return back()->with(['error' => 'Type has child type cannot delete']);
+        if ($category->childrenCategory()->exists()) {
+            return back()->with(['error' => 'category has child cannot delete']);
         }
-        $type->delete();
-        return redirect('/dashboard/types')->with('message', 'Type deleted successfully');
+        $category->delete();
+        return redirect('/dashboard/categories')->with('message', 'category deleted successfully');
     }
 }

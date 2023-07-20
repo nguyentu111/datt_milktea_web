@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductCollection;
+use App\Models\Category;
 use App\Models\DrinkSize;
 use App\Models\Product;
 use App\Models\ProductImPrice;
@@ -37,17 +38,26 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $materials = Product::query()->whereHas('type', function ($query) {
-            $query->where('name', 'Materials');
-        })->get();
-        $toppings = Product::query()->whereHas('type', function ($query) {
-            $query->where('name', 'Toppings')->orWhere('name', 'Materials');
-        })->get();
+        $materials = Product::query()->whereHas('types', function ($query) {
+            $query->where('type', TYPE::MATERIAL);
+        })->where('active', true)->get();
+        $toppings = Product::query()->whereHas('types', function ($query) {
+            $query->where('type', TYPE::TOPPING);
+        })->where('active', true)->get();
+        $categories = Category::all();
         $taxs = Tax::all();
         $uoms = Uom::all();
         $types = Type::all();
         $sizes = Size::all();
-        return view("bewama::pages/dashboard/product/create", compact('materials', 'taxs', 'types', 'uoms', 'sizes', 'toppings'));
+        return view("bewama::pages/dashboard/product/create", compact(
+            'materials',
+            'taxs',
+            'types',
+            'uoms',
+            'sizes',
+            'toppings',
+            'categories'
+        ));
     }
 
     /**
@@ -60,72 +70,75 @@ class ProductController extends Controller
             'description' => ['sometimes'],
             'tax_id' => ['required'],
             'uom_id' => ['required'],
-            'type_id' => ['required'],
             'active' => ['required'],
             'sizes' => ['string'],
             'toppings' => ['string'],
             'import_price' => ['sometimes'],
-            'export_price' => ['sometimes']
+            'export_price' => ['sometimes'],
+            'types' => 'string',
+            'category_id' => 'sometimes'
         ]);
         $picture = null;
         if ($request->has('picture')) {
             $picture = cloudinary()->upload($request->file('picture')->getRealPath())->getSecurePath();
         }
 
-        try {
-            DB::beginTransaction();
-            $product = Product::create([
-                ...$data,
-                'picture' => $picture,
+        // try {
+        DB::beginTransaction();
+        $product = Product::create([
+            ...$data,
+            'picture' => $picture,
+        ]);
+        if (isset($data['import_price']))
+            ProductImPrice::create([
+                'product_id' => $product->id,
+                'price' => $data['import_price'],
+                'apply_from' => date("Y-m-d H:i:s")
             ]);
-            if (isset($data['import_price']))
-                ProductImPrice::create([
-                    'product_id' => $product->id,
-                    'price' => $data['import_price'],
-                    'apply_from' => date("Y-m-d H:i:s")
-                ]);
-            if (isset($data['export_price']))
+        if (isset($data['export_price']))
 
-                ProductExPrice::create([
-                    'product_id' => $product->id,
-                    'price' => $data['export_price'],
-                    'apply_from' => date("Y-m-d H:i:s")
-                ]);
-            $toppings = [];
-            foreach (json_decode($data['toppings']) as $topping) {
-                $toppings[] = [
-                    'material_id' => $topping->material_id,
-                    'drink_id' => $product->id,
-                    'active' => $topping->active,
-                    'amount' => $topping->amount,
-                ];
-            }
-            Topping::insertOrIgnore($toppings);
-            $sizes = json_decode($data['sizes']);
-            foreach ($sizes as $size) {
-                $newDrinkSize = [
-                    'drink_id' => $product->id,
-                    'size_id' => $size->size_id,
-                    'active' => $size->active,
-                    'price_up_percent' => $size->price_up_percent,
-                ];
-                $insertedSize = DrinkSize::create($newDrinkSize);
-                $recipes = [];
-                foreach ($size->materials as $material) {
-                    $recipes[] = [
-                        'drink_size_id' => $insertedSize->id,
-                        'material_id' => $material->material_id,
-                        'amount' => $material->amount,
-                    ];
-                }
-                Recipe::insertOrIgnore($recipes);
-            }
-            DB::commit();
-            return redirect('dashboard/products')->with('message', __('Product created successfully'));
-        } catch (Exception $e) {
-            DB::rollBack();
-            return back()->with('error', __($e->getMessage()));
+            ProductExPrice::create([
+                'product_id' => $product->id,
+                'price' => $data['export_price'],
+                'apply_from' => date("Y-m-d H:i:s")
+            ]);
+        $toppings = [];
+        $product->types()->sync(json_decode($data['types']));
+        foreach (json_decode($data['toppings']) as $topping) {
+            $toppings[] = [
+                'material_id' => $topping->material_id,
+                'drink_id' => $product->id,
+                'active' => $topping->active,
+                'amount' => $topping->amount,
+            ];
         }
+        Topping::insertOrIgnore($toppings);
+        $sizes = json_decode($data['sizes']);
+        foreach ($sizes as $size) {
+            $newDrinkSize = [
+                'drink_id' => $product->id,
+                'size_id' => $size->size_id,
+                'active' => $size->active,
+                'price_up_percent' => $size->price_up_percent,
+            ];
+            $insertedSize = DrinkSize::create($newDrinkSize);
+            $recipes = [];
+            foreach ($size->materials as $material) {
+                $recipes[] = [
+                    'drink_size_id' => $insertedSize->id,
+                    'material_id' => $material->material_id,
+                    'amount' => $material->amount,
+                ];
+            }
+            Recipe::insertOrIgnore($recipes);
+        }
+        DB::commit();
+        return redirect('dashboard/products')->with('message', __('Product created successfully'));
+        // } catch (Exception $e) {
+        //     DB::rollBack();
+        //     dd($e);
+        //     return back()->with('error', __($e->getMessage()));
+        // }
     }
 
     /**
@@ -133,17 +146,27 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        $materials = Product::query()->whereHas('type', function ($query) {
-            $query->where('name', 'Materials');
+        $materials = Product::query()->whereHas('types', function ($query) {
+            $query->where('type', TYPE::MATERIAL);
         })->where('active', '1')->get();
-        $toppings = Product::query()->whereHas('type', function ($query) {
-            $query->where('name', 'Toppings')->orWhere('name', 'Materials');
+        $toppings = Product::query()->whereHas('types', function ($query) {
+            $query->where('type', TYPE::TOPPING);
         })->where('active', '1')->get();
         $taxs = Tax::all();
         $uoms = Uom::all();
         $types = Type::all();
+        $categories = Category::all();
         $sizes = Size::all();
-        return view('bewama::pages/dashboard/product/show', compact('materials', 'taxs', 'types', 'uoms', 'sizes', 'product', 'toppings'));
+        return view('bewama::pages/dashboard/product/show', compact(
+            'materials',
+            'taxs',
+            'types',
+            'uoms',
+            'sizes',
+            'categories',
+            'product',
+            'toppings'
+        ));
     }
 
     /**
@@ -164,13 +187,15 @@ class ProductController extends Controller
             'description' => ['sometimes'],
             'tax_id' => ['required'],
             'uom_id' => ['required'],
-            'type_id' => ['required'],
+            'category_id' => ['sometimes'],
             'active' => ['required'],
             'sizes' => ['string'],
             'toppings' => ['string'],
             'import_price' => ['string'],
-            'export_price' => ['string']
+            'export_price' => ['string'],
+            'types' => 'string'
         ]);
+
         $picture = $product->picture;
         if ($request->has('picture')) {
             $picture = cloudinary()->upload($request->file('picture')->getRealPath())->getSecurePath();
@@ -180,25 +205,15 @@ class ProductController extends Controller
             DB::beginTransaction();
             $product->update([
                 ...$data,
+                'category_id' => $data['category_id'] ?? null,
                 'picture' => $picture,
             ]);
-            // if (isset($data['import_price']))
-            //     ProductImPrice::create([
-            //         'product_id' => $product->id,
-            //         'price' => $data['import_price'],
-            //         'apply_from' => date("Y-m-d H:i:s")
-            //     ]);
-            // if (isset($data['export_price']))
-
-            //     ProductExPrice::create([
-            //         'product_id' => $product->id,
-            //         'price' => $data['export_price'],
-            //         'apply_from' => date("Y-m-d H:i:s")
-            //     ]);
             $product->recipes()->delete();
             $product->toppings()->delete();
             $product->drinkSizes()->delete();
             $toppings = [];
+            $product->types()->sync(json_decode($data['types']));
+
             foreach (json_decode($data['toppings']) as $topping) {
                 $toppings[] = [
                     'material_id' => $topping->material_id,
@@ -246,8 +261,8 @@ class ProductController extends Controller
 
     public function getDrinks()
     {
-        $products = Product::query()->whereHas('type', fn ($q) => $q->where('name', 'Drinks'))
-            ->with(['type', 'uom', 'tax', 'sizes', 'availableToppings', 'tax', 'promotions' => function ($query) {
+        $products = Product::query()->whereHas('types', fn ($q) => $q->where('type', 'drink'))
+            ->with(['category', 'uom', 'tax', 'sizes', 'availableToppings', 'tax', 'recipes', 'promotions' => function ($query) {
                 $query->where('from_time', '<=', date("Y-m-d H:i:s"))->where('to_time', '>', date("Y-m-d H:i:s"));
             }])->where('active', true)->get();
         // $products->each->append('currentExportPrice');

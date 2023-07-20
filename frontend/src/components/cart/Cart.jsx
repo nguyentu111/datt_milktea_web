@@ -1,29 +1,25 @@
 import { faCartPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useContext, useRef, useState } from "react";
+import { useState } from "react";
 import Modal from "../shared/Modal";
-import { useOnClickOutside } from "usehooks-ts";
 import classNames from "classnames";
 import CartItem from "./CartItem";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useQueryClient } from "react-query";
-import { SigninContext, useSigninModel } from "../../contexts/SigninContext";
+import { useSigninModel } from "../../contexts/SigninContext";
 export default function Cart() {
   const [open, setOpen] = useState(false);
   const nav = useNavigate();
   const cart = useSelector((state) => state.cart.data);
   localStorage.setItem("cart", JSON.stringify(cart));
-  const queryClient = useQueryClient();
-  const user = queryClient.getQueryData("user");
-  const token = queryClient.getQueryData("token");
+  const { user, token } = useSelector((state) => state.user);
   const [openSignin, setOpenSignin] = useSigninModel();
   const total = cart.reduce((acc, v) => {
     return (
       acc +
       ((v.drink.promotion_amount ?? v.drink.regular_amount) +
         v.toppings.reduce((acc, v) => acc + v.price, 0) +
-        v.size.price) *
+        (v.size?.price ?? 0)) *
         v.quantity
     );
   }, 0);
