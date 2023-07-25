@@ -26,7 +26,7 @@ class Customer extends Model
     }
     public function likedDrinks()
     {
-        return $this->belongsToMany(Drink::class, 'linked_drinks', 'customer_id', 'drink_id');
+        return $this->belongsToMany(Product::class, 'liked_drinks', 'customer_id', 'drink_id');
     }
     public function infomation(): Attribute
     {

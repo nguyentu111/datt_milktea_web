@@ -46,11 +46,14 @@ export const cartSlide = createSlice({
       );
       state.data.splice(index, 1);
     },
+    removeAll: (state) => {
+      state.data = [];
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { addDrink, removeDrink } = cartSlide.actions;
+export const { addDrink, removeDrink, removeAll } = cartSlide.actions;
 export const useAddToCart = function () {
   const dispatch = useDispatch();
   return (payload) => dispatch(addDrink(payload));
@@ -59,5 +62,8 @@ export const useRemoveCartItem = function () {
   const dispatch = useDispatch();
   return (payload) => dispatch(removeDrink(payload));
 };
-
+export const useRemoveAllCart = function () {
+  const dispatch = useDispatch();
+  return (payload) => dispatch(removeAll(payload));
+};
 export default cartSlide.reducer;

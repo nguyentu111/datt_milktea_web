@@ -165,7 +165,7 @@
 
                                         <div class="flex gap-2 col-span-3 items-center">
                                             <label class="">Price up</label>
-                                            <x-bewama::form.input.text name="price-up-{{$size->id}}" placeholder="percent" class="max-w-[100px] decimal-only" />
+                                            <x-bewama::form.input.text name="price-up-{{$size->id}}" class="max-w-[100px] decimal-only" />
                                         </div>
                                     </div>
                                     @endforeach

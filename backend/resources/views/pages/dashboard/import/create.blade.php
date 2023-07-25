@@ -41,7 +41,14 @@
                                             <input type="checkbox" id="product-{{$product->id}}" class="product-checkbox" />
                                             <img src="{{$product->picture ?? asset('assets/images/img-placeholder.png')  }}" class="w-20 h-20 object-contain" />
                                             <span class="max-w-[400px] min-w-[200px] truncate">{{$product->name}} ({{$product->uom->name}})</span>
-                                            <x-bewama::form.input.text data-product="{{$product->id}}" name="amount-{{$product->id}}" placeholder="amount" class="max-w-[200px] decimal-only moneyformat hidden amount" />
+                                            <div class="hidden">
+                                                <div class="flex">
+                                                    <x-bewama::form.input.text data-product="{{$product->id}}" data-productprice="{{$product->currentImportPrice}}" name="amount-{{$product->id}}" placeholder="amount" class="max-w-[200px] decimal-only moneyformat amount" />
+                                                    <span class="ml-4 flex">
+                                                        <span>Total : <span class="total"></span> đ</span>
+                                                    </span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </label>
                                     @endforeach
@@ -97,13 +104,18 @@
         })
         $('.product-checkbox').on('change', function(e) {
             if (e.target.checked) {
-                e.target.parentElement.lastElementChild.style.display = 'block';
-                $(e.target.parentElement.lastElementChild).prop('required', true);
+                $(e.target).parent().find('input').last().parent().parent().show()
+                $(e.target).parent().find('input').prop('required', true);
             } else {
-                e.target.parentElement.lastElementChild.style.display = 'none';
-                $(e.target.parentElement.lastElementChild).prop('required', false);
+                $(e.target).parent().find('input').last().parent().parent().hide();
+                $(e.target).parent().find('input').prop('required', false);
 
             }
+        })
+        $('.amount').on('input', function(e) {
+            const amount = parseFloat($(e.target).val());
+            // console.log($(e.target).parent().find('.total'));
+            $(e.target).parent().find('.total').text((Math.round($(e.target).data('productprice') * amount) / 1000) * 1000)
         })
         const form = $('form');
         form.on('submit', function(e) {
@@ -122,7 +134,7 @@
                 if (!$(item).is(':hidden')) {
                     products.push({
                         material_id: $(item).data('product'),
-                        amount: $(item).val().replace('.', '')
+                        amount: parseFloat($(item).val())
 
                     })
                 }

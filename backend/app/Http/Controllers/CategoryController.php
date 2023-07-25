@@ -6,11 +6,12 @@ use App\Models\Category;
 use App\Models\Type;
 use App\Tables\CategoryTable;
 use App\Tables\TypeTable;
+use App\Traits\ApiResponses;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-
+    use ApiResponses;
     /**
      * Display a listing of the resource.
      */
@@ -106,4 +107,11 @@ class CategoryController extends Controller
         $category->delete();
         return redirect('/dashboard/categories')->with('message', 'category deleted successfully');
     }
+    //api:
+    public function getCategories()
+    {
+        return $this->successCollectionResponse(Category::with('descendants')->whereNull('parent_id')->get());
+    }
+
+    //end api
 }

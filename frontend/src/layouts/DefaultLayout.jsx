@@ -7,7 +7,10 @@ export default function DefaultLayout() {
       <Header />
       <div className="flex container m-auto pt-6 gap-4 ">
         <CategorySidebar />
-        <Outlet />
+        <div className="w-full">
+          {" "}
+          <Outlet />
+        </div>
       </div>
     </>
   );

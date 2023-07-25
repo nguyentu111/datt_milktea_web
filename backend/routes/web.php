@@ -18,7 +18,8 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\TypeController;
 use App\Http\Controllers\UomController;
-use App\Models\Supplier;
+use App\Http\Controllers\StatisticController;
+use App\Http\Controllers\Customer\CustomerController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->group(function () {
@@ -49,7 +50,10 @@ Route::prefix('dashboard')->group(function () {
 
         Route::resource('suppliers', SupplierController::class);
         Route::resource('imports', ImportController::class);
-        Route::resource('orders', OrderController::class);
+        Route::get('orders-cheff', [OrderController::class, 'orderCheff'])->name('orders.orderCheff');
+        Route::get('orders-cashier', [OrderController::class, 'orderCashier'])->name('orders.orderCashier');
+        Route::get('add-orders', [OrderController::class, 'addOrder'])->name('orders.addOrder');
+        Route::get('statistics', [StatisticController::class, 'index'])->name('statistics.index');
 
         Route::resource('sizes', SizeController::class);
         Route::resource('types', TypeController::class);
@@ -57,6 +61,8 @@ Route::prefix('dashboard')->group(function () {
         Route::resource('uoms', UomController::class);
         Route::resource('branches', BranchController::class);
         Route::get('search-branch', [SearchBranchController::class, '__invoke']);
+        Route::get('search-cus', [CustomerController::class, 'searchCustomer']);
+        Route::post('add-cus', [CustomerController::class, 'addCustomer']);
         Route::post('update-order-status', [OrderStatusController::class, '__invoke']);
     });
 });

@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Branch;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Branch;
+use App\Models\Customer;
 use App\Tables\BranchTable;
 use App\Traits\ApiResponses;
 use Cloudinary\Cloudinary;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 
 class BranchController extends Controller
 {
@@ -48,6 +50,11 @@ class BranchController extends Controller
             'active' => 'required',
             'picture' => ['required', 'image'],
             'date_open' => ['required'],
+        ]);
+        Customer::create([
+            'first_name' => $validation['name'],
+            'last_name' => 'default',
+            'phone' => 0,
         ]);
         $uploadedFileUrl = cloudinary()->upload($request->file('picture')->getRealPath())->getSecurePath();
         Branch::create(array_merge($validation, ['picture' => $uploadedFileUrl]));
@@ -94,6 +101,18 @@ class BranchController extends Controller
             'picture' => ['image'],
             'date_open' => ['required'],
         ]);
+        $defaultCustomer = $this->getDefaultCustomer();
+        if ($defaultCustomer) {
+            $defaultCustomer->first_name = $data['name'];
+            $defaultCustomer->save();
+        } else {
+            Customer::create([
+                'first_name' => $data['name'],
+                'last_name' => 'default',
+                'phone' => 0,
+            ]);
+        }
+
         if ($request->has('picture')) {
             $uploadedFileUrl = cloudinary()->upload($request->file('picture')->getRealPath())->getSecurePath();
             $branch->update(array_merge($data, ['picture' => $uploadedFileUrl]));
@@ -132,5 +151,12 @@ class BranchController extends Controller
     {
         $branches = Branch::query()->with(['products'])->where('active', true)->get();
         return $this->successCollectionResponse($branches);
+    }
+    protected function getDefaultCustomer()
+    {
+        $branchName = Auth::user()->staff->branch->name;
+        $defaultCus = Customer::query()->where('last_name', 'default')
+            ->where('first_name', $branchName)->get();
+        return $defaultCus;
     }
 }

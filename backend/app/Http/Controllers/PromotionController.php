@@ -24,8 +24,8 @@ class PromotionController extends Controller
      */
     public function create()
     {
-        $products = Product::query()->where(['active' => true])->whereHas('type', function ($query) {
-            $query->whereNot('name', 'Toppings')->whereNot('name', 'Materials');
+        $products = Product::query()->where(['active' => true])->whereHas('types', function ($query) {
+            $query->where('type', 'drink');
         })->get();
         return view('bewama::pages/dashboard/promotion/create', compact('products'));
     }
@@ -70,8 +70,8 @@ class PromotionController extends Controller
      */
     public function show(Promotion $promotion)
     {
-        $products = Product::query()->where(['active' => true])->whereHas('type', function ($query) {
-            $query->whereNot('name', 'Toppings')->whereNot('name', 'Materials');
+        $products = Product::query()->where(['active' => true])->whereHas('types', function ($query) {
+            $query->where('type', 'drink');
         })->get();
         return view('bewama::pages/dashboard/promotion/show', compact('promotion', 'products'));
     }

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components";
+import { useGetCategories } from "../hooks/product/category";
+import { useNavigate, Link } from "react-router-dom";
 
 const UL = styled.ul`
   list-style: none;
@@ -10,22 +12,23 @@ const LI = styled.li``;
 const Item = styled.div`
   display: flex;
   padding: 12px 18px;
-  padding-left: ${(props) => `${props.dept * 18}px`};
+  /* padding-left: ${(props) => `${props.dept * 18}px`}; */
   align-items: center;
 `;
 const Label = styled.span`
-  /* width: 100%; */
+  width: 100%;
   display: block;
   cursor: pointer;
 `;
 const Arrow = styled.span`
+  border-left: 2px #ccc solid;
   display: flex;
   height: 25px;
   width: 35px;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-
+  margin-left: auto;
   &::after {
     content: "";
     width: 0;
@@ -35,92 +38,15 @@ const Arrow = styled.span`
 
     border-top: 4px solid #000;
 
-    transform: ${(props) => (props.toggle ? "rotate(180deg)" : "rotate(0deg)")};
+    /* transform: ${(props) =>
+      props.toggle ? "rotate(180deg)" : "rotate(0deg)"}; */
   }
 `;
-const menus = [
-  {
-    label: "Menu 1",
-  },
-  {
-    label: "Menu 2",
-    submenu: [
-      {
-        label: "Sub Menu 1",
-      },
-      {
-        label: "Sub Menu 2",
-      },
-    ],
-  },
-  {
-    label: "Menu 3",
-    submenu: [
-      {
-        label: "Sub Menu 1",
-        submenu: [
-          {
-            label: "Boom 1",
-          },
-          {
-            label: "Boom 2",
-          },
-        ],
-      },
-      {
-        label: "Sub Menu 2",
-        submenu: [
-          {
-            label: "Deep 1",
-          },
-          {
-            label: "Deep 2",
-            submenu: [
-              {
-                label: "Lorem 1",
-              },
-              {
-                label: "Lorem 2",
-                submenu: [
-                  {
-                    label: "Super Deep",
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
-      {
-        label: "Sub Menu 3",
-      },
-      {
-        label: "Sub Menu 4",
-        submenu: [
-          {
-            label: "Last 1",
-          },
-          {
-            label: "Last 2",
-          },
-          {
-            label: "Last 3",
-          },
-        ],
-      },
-    ],
-  },
-  {
-    label: "Menu 4",
-  },
-];
 export default function CategorySidebar() {
   const [activeMenus, setActiveMenus] = useState([]);
-
-  const handleMenuClick = (data) => {
-    console.log(data);
-  };
-
+  const { data } = useGetCategories();
+  const categories = data?.data?.data;
+  const nav = useNavigate();
   const handleArrowClick = (menuName) => {
     let newActiveMenus = [...activeMenus];
 
@@ -139,7 +65,9 @@ export default function CategorySidebar() {
   const ListMenu = ({ dept, data, hasSubMenu, menuName, menuIndex }) => (
     <LI>
       <Item dept={dept}>
-        <Label onClick={() => handleMenuClick(data)}>{data.label} </Label>
+        <Label onClick={() => nav(`/category/${data.slug}`)}>
+          {data.name}{" "}
+        </Label>
         {hasSubMenu && (
           <Arrow
             onClick={() => handleArrowClick(menuName)}
@@ -150,7 +78,7 @@ export default function CategorySidebar() {
       {hasSubMenu && (
         <SubMenu
           dept={dept}
-          data={data.submenu}
+          data={data.descendants}
           toggle={activeMenus.includes(menuName)}
           menuIndex={menuIndex}
         />
@@ -168,13 +96,13 @@ export default function CategorySidebar() {
     return (
       <UL>
         {data.map((menu, index) => {
-          const menuName = `sidebar-submenu-${dept}-${menuIndex}-${index}`;
+          const menuName = menu.name;
 
           return (
             <ListMenu
               dept={dept}
               data={menu}
-              hasSubMenu={menu.submenu}
+              hasSubMenu={menu.descendants.length > 0}
               menuName={menuName}
               key={menuName}
               menuIndex={index}
@@ -186,19 +114,22 @@ export default function CategorySidebar() {
   };
 
   return (
-    <div>
-      <div className="bg-primary menu py-2 rounded mb-4">All Category</div>
+    <div className="">
+      <Link to="/" className="block bg-primary menu py-2 rounded mb-4">
+        All Category
+      </Link>
       <div className="w-[300px] bg-secondary rounded">
+        {!categories && <span className="p-2">Loading...</span>}
         <UL>
-          {menus.map((menu, index) => {
+          {categories?.map((menu, index) => {
             const dept = 1;
-            const menuName = `sidebar-menu-${dept}-${index}`;
+            const menuName = menu.name;
 
             return (
               <ListMenu
                 dept={dept}
                 data={menu}
-                hasSubMenu={menu.submenu}
+                hasSubMenu={menu.descendants.length > 0}
                 menuName={menuName}
                 key={menuName}
                 menuIndex={index}

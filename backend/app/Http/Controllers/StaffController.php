@@ -146,7 +146,7 @@ class StaffController extends Controller
         }
         try {
             DB::beginTransaction();
-            $staff->update($validation);
+            // $staff->update($validation);
             $staff->roles()->delete();
             $roles = [];
             foreach ($validation['roles'] as $role) {

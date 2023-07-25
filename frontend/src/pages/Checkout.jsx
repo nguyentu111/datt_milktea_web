@@ -8,20 +8,26 @@ import { useSelector } from "react-redux";
 import useCheckOut from "../hooks/checkout/checkout";
 import toastr from "toastr";
 import { useNavigate } from "react-router-dom";
+import { useRemoveAllCart } from "../redux/cart";
+import { useAddressModel } from "../contexts/AddressModalContext";
 const shipFee = Math.round(Math.random() * 20) * 1000;
 export default function Checkout() {
   const [openStoreModel, setOpenStoreModel] = useState(false);
-  const { data } = useUserAddress();
+  const { data: userAdresses } = useUserAddress();
   const [address, setAddress] = useState(null);
   const { data: dataBranches } = useGetAllBranch();
   const [branch, setBranch] = useState(null);
   const [paymentType, setPaymentType] = useState("cash");
   const cart = useSelector((state) => state.cart.data);
   const [note, setNote] = useState(null);
+  // eslint-disable-next-line no-unused-vars
+  const [_, setOpenAddressModal] = useAddressModel();
   const nav = useNavigate();
+  const removeCart = useRemoveAllCart();
   const { mutate } = useCheckOut({
-    onSuccess: (response) => {
+    onSuccess: () => {
       toastr.success("Check out successfully");
+      removeCart();
       nav("/");
     },
     onError: (error) => {
@@ -55,6 +61,10 @@ export default function Checkout() {
     tax +
     shipFee;
   const handleCheckout = () => {
+    if (!address) {
+      setOpenAddressModal(true);
+      return;
+    }
     const data = {
       tax_amount: tax,
       ship_note: note,
@@ -65,16 +75,22 @@ export default function Checkout() {
       payment_type: paymentType,
       branch_id: branch.id,
     };
+    console.log({ items: cart, ...data });
     mutate({ items: cart, ...data });
   };
 
   useEffect(() => {
-    if (data && address == null) {
-      const defaultAddress = data.data.data.find((v) => v.is_default);
+    if (userAdresses && address == null) {
+      const defaultAddress = userAdresses.data.data.find((v) => v.is_default);
       if (defaultAddress) setAddress(defaultAddress);
-      else if (data.data.data.length > 0) setAddress(data.data.data[0]);
+      else if (userAdresses.data.data.length > 0)
+        setAddress(userAdresses.data.data[0]);
+      else {
+        toastr.error("You need to add an address !");
+        setOpenAddressModal(true);
+      }
     }
-  }, [data]);
+  }, [userAdresses]);
   useEffect(() => {
     if (dataBranches && branch == null) {
       setBranch(dataBranches.data.data[0]);
@@ -122,7 +138,7 @@ export default function Checkout() {
               <span className="font-bold text-[16px]">Ship to address</span>
               <AddAddress />
               <div className=" mt-4 border-2 max-h-[400px] overflow-y-auto">
-                {data?.data.data.map((val) => (
+                {userAdresses?.data.data.map((val) => (
                   <div
                     onClick={() => setAddress(val)}
                     key={val.id}

@@ -7,7 +7,7 @@ export default function Header() {
     <div className="border-2">
       <div className="container py-6 px-4 mx-auto flex justify-between">
         <Link to="/">
-          <img src="logo.png" />
+          <img src="/logo.png" />
         </Link>
         <Search />
         <HeaderActions />

@@ -23,6 +23,15 @@ export default function UserSideBar({ tab, setTab }) {
         >
           Address list
         </div>
+        <div
+          className={classNames(
+            "px-4 py-2 cursor-pointer hover:underline border-b-2 border-gray-300",
+            tab == 3 && "bg-primary text-white"
+          )}
+          onClick={() => setTab(3)}
+        >
+          Order history
+        </div>
       </div>
     </div>
   );

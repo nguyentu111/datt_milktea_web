@@ -1,13 +1,13 @@
 import { useQuery } from "react-query";
 import { axiosClient } from "../../utils/request";
 import { useSelector } from "react-redux";
-
-export default function useUserAddress() {
-  const { user, token } = useSelector((state) => state.user);
+// import toastr from "toastr";
+export default function useOrderHistory() {
+  const { token } = useSelector((state) => state.user);
   return useQuery({
-    queryKey: "user-addresses",
+    queryKey: "order-history",
     queryFn: () => {
-      return axiosClient.get("customer/" + user?.customer_id + "/addresses", {
+      return axiosClient.get("customer/order-history", {
         headers: {
           Authorization: "Bearer " + token,
         },
@@ -15,6 +15,7 @@ export default function useUserAddress() {
     },
     onError: (error) => {
       console.log(error);
+      //   toastr.error("get order history failed");
     },
     staleTime: Infinity,
   });

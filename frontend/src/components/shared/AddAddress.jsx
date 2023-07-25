@@ -5,19 +5,17 @@ import { axiosClient } from "../../utils/request";
 import { useMutation, useQueryClient } from "react-query";
 import toastr from "toastr";
 import { useSelector } from "react-redux";
+import { useAddressModel } from "../../contexts/AddressModalContext";
 export default function AddAddress() {
-  const [openAdressModel, setOpenAdressModel] = useState(false);
+  const [openAdressModel, setOpenAdressModel] = useAddressModel(false);
 
   const [allProvinces, setAllProvinces] = useState([]);
   const [provinceChoosed, setProvincehoosed] = useState(null);
   const [districts, setDistricts] = useState(null);
   const [districtChoosed, setDistrictChoosed] = useState(null);
   const [wards, setWards] = useState(null);
-  // const [wardChoosed, setWardChoosed] = useState(null);
   const { register, handleSubmit } = useForm();
   const queryClient = useQueryClient();
-  // const user = queryClient.getQueryData("user");
-  // const token = queryClient.getQueryData("token");
   const { user, token } = useSelector((state) => state.user);
   const {
     mutate,
@@ -66,13 +64,9 @@ export default function AddAddress() {
         .then((res) => setWards(res));
   };
   const onSubmit = async (data) => {
-    const response = await mutate({
+    mutate({
       is_default: data.is_default,
       address: data.address + " " + data.ward,
-    });
-    console.log({
-      response,
-      mutateData,
     });
   };
   return (

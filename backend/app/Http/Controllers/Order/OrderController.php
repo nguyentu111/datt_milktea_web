@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\Order;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductCollection;
+use App\Models\Customer;
 use App\Models\DrinkSize;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Traits\ApiResponses;
 use Exception;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -20,165 +24,36 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function orderCheff()
     {
+        $branchId = Auth::user()->staff->branch->id;
+
         $orders = Order::query()->with(['orderDetails.toppings.product.uom', 'orderDetails.drinkSize.recipes.material.uom', 'orderDetails.drinkSize.product', 'orderDetails.drinkSize.size'])
-            ->where('status', 'pending')->orWhere('status', 'wait_for_shipping')->orWhere('status', 'processing')->orderbyDesc('created_at')->get();
-        // dd($order);
-        return view('bewama::pages/dashboard/order/index', compact('orders'));
+            ->orWhere(function (Builder $query) {
+                $query->orWhere('status', 'pending')->orWhere('status', 'wait_for_shipping')->orWhere('status', 'processing');
+            })->where('branch_id', $branchId)->orderbyDesc('created_at')->get();
+        return view('bewama::pages/dashboard/order/order-cheff', compact('orders'));
     }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function orderCashier()
     {
-        //
+        $branchId = Auth::user()->staff->branch->id;
+        $defaultCus = $this->getDefaultCustomer();
+        $orders = Order::query()->with([
+            'orderDetails.toppings.product.uom', 'orderDetails.drinkSize.recipes.material.uom',
+            'orderDetails.drinkSize.product', 'orderDetails.drinkSize.size', 'cheff'
+        ])
+            ->where('branch_id', $branchId)->orderbyDesc('created_at')->get();
+        return view('bewama::pages/dashboard/order/order-cashier', compact('orders', 'defaultCus'));
     }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreOrder $request)
+    public function addOrder()
     {
-        $data = $request->all();
-
-        $result = DB::transaction(function () use ($data) {
-
-            $data['status'] = 1;
-            // $data['created']
-            $new_order = Order::create($data);
-
-            foreach ($data['order_detail'] as $key => $order_detail) {
-                $topping_list = [];
-
-                $drink_detail = DrinkDetail::find($order_detail['drink_detail_id']);
-                $drink_info = Drink::find($drink_detail['drink_id']);
-                $drink_info['sales_on_day'] =  $order_detail['quantity'] + $drink_info['sales_on_day'];
-                $drink_info->save();
-
-                foreach ($order_detail['topping_list'] as $key1 => $toppings) {
-                    $topping_list[$key1]['quan'] = $toppings['quan'];
-                    $topping_list[$key1]['price'] = [];
-                    foreach ($toppings['topping'] as $key2 => $topping) {
-                        $topping_list[$key1]['price'][$key2] = Topping::select('price')->where('id', $topping['topping_id'])->first()->price + 0;
-                        $topping_list[$key1]['topping'][$key2] = $topping['topping_id'];
-                    }
-                }
-
-                $new_order->drinkDetails()->attach(
-                    $order_detail['drink_detail_id'],
-                    [
-                        'quantity' => $order_detail['quantity'],
-                        'price' => $order_detail['price'],
-                        'topping_list' => json_encode($topping_list)
-                    ]
-                );
-            }
-            return $new_order;
-        });
-
-        if ($result == null) {
-            return response()->json([
-                'status'   => 'error',
-                'msg' => "Them that bai"
-            ], 422);
-        } else {
-            return response()->json([
-                'status'   => 'success',
-                'msg' => "Them thanh cong",
-                'newOrder' => new OrderResource(Order::find($result['id'])),
-            ]);
-        }
+        $drinks = $this->getDrinks();
+        $drinks = new ProductCollection($drinks);
+        $defaultCus = $this->getDefaultCustomer();
+        return view('bewama::pages/dashboard/order/add-order', compact('drinks', 'defaultCus'));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Order $order)
-    {
-        $data = $order->drinkDetails()->get();
-        $order_details = [];
-        $toppingList = [];
-        $i = 0;
-
-        foreach ($data as $order_detail) {
-            $order_details[$i]['drinkDetail'] = DrinkDetail::find($order_detail['id']);
-            $order_details[$i]['drink_detail_id'] = $order_detail['id'];
-            $order_details[$i]['drinkName'] = Drink::select('name')->where('id', $order_details[$i]['drinkDetail']['drink_id'])->first()['name'];
-            $order_details[$i]['drinkSize'] = Size::select('name')->where('id', $order_details[$i]['drinkDetail']['size_id'])->first()['name'];
-            $order_details[$i]['quantity'] = $order_detail['pivot']['quantity'];
-            $order_details[$i]['price'] = $order_detail['pivot']['price'];
-
-
-            if ($order_detail['pivot']['topping_list'] != null) {
-                $order_details[$i]['topping_list']  = json_decode($order_detail['pivot']['topping_list'], true);
-                foreach ($order_details[$i]['topping_list'] as $key => $toppings) {
-                    foreach ($toppings['topping'] as $key_topping => $topping_id) {
-                        $topping_info = Topping::select('id', 'name')->where('id', $topping_id)->first();
-                        $topping_info['price'] = $toppings['price'][$key_topping];
-                        $order_details[$i]['topping_list'][$key]['toppingInfo'][$key_topping] = $topping_info;
-                    }
-                    unset($order_details[$i]['topping_list'][$key]['price']);
-                    unset($order_details[$i]['topping_list'][$key]['topping']);
-                }
-            } else {
-                $order_details[$i]['topping_list'] == 'null';
-            }
-            unset($order_details[$i]['drinkDetail']);
-            $i += 1;
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'order' => new OrderResource($order),
-            'orderDetail' => $order_details
-        ]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
-
-    public function orderOnWeb(Request $request)
+    public function orderOnline(Request $request)
     {
         $data = $request->all();
 
@@ -201,6 +76,7 @@ class OrderController extends Controller
                     'order_id' =>  $order->id,
                     'regular_amount' => $item['drink']['regular_amount'],
                     'promotion_amount' => $item['drink']['promotion_amount'],
+                    'amount' => $item['quantity']
                 ]);
 
                 $toppings = [];
@@ -221,5 +97,32 @@ class OrderController extends Controller
             throw $e;
             return  $this->errorResponse(['message' => $e->getMessage()], 422);
         }
+    }
+    protected function getDefaultCustomer()
+    {
+        $branchName = Auth::user()->staff->branch->name;
+        $defaultCus = Customer::query()->where('last_name', 'default')
+            ->where('first_name', $branchName)->get();
+        return $defaultCus;
+    }
+
+
+    public function getDrinks()
+    {
+        $products = Product::query()->whereHas('types', fn ($q) => $q->where('type', 'drink'))
+            ->with(['category', 'uom', 'tax', 'sizes', 'availableToppings', 'tax', 'recipes', 'promotions' => function ($query) {
+                $query->where('from_time', '<=', date("Y-m-d H:i:s"))->where('to_time', '>', date("Y-m-d H:i:s"));
+            }])->where('active', true)->get();
+        return $products;
+    }
+    //api :
+    public function getOrderHistory()
+    {
+        $customer = Auth::user()->customer;
+        $order = Order::with(['orderDetails.drinkSize.product', 'orderDetails.toppings.product', 'orderDetails.drinkSize.size'])
+            ->where('customer_id', $customer->id)->orWhereHas('customer', function ($query) use ($customer) {
+                $query->where('phone', $customer->phone);
+            })->get();
+        return $this->successCollectionResponse($order);
     }
 }

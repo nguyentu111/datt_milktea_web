@@ -1,4 +1,3 @@
-import { faHeart } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import Modal from "./Modal";
@@ -6,23 +5,19 @@ import DrinkSizeBtns from "./DrinkSizeBtns";
 import ToppingBtns from "./ToppingBtns";
 import { faCartPlus } from "@fortawesome/free-solid-svg-icons";
 import AddToFavovite from "./AddToFavoriteBtn";
-import { useLocalStorage } from "usehooks-ts";
 import { useAddToCart } from "../../redux/cart";
 import toastr from "toastr";
+import { useSelector } from "react-redux";
 export default function ProductCard({ data }) {
   const [openModal, setOpenModel] = useState(false);
   const [size, setSize] = useState(data.sizes[0]);
   const [quantity, setQuantity] = useState(1);
   const [toppings, setToppings] = useState([]);
-  const [drinks, setDrinks] = useLocalStorage("cart-drinks", []);
+  const { user, token } = useSelector((state) => state.user);
   const add = useAddToCart();
   const [total, setTotal] = useState(
     (data.promotion_amount ?? data.regular_amount) + data.sizes[0]?.price
   );
-
-  const handleLikeBtn = (e) => {
-    e.preventDefault();
-  };
   const handleAddCart = () => {
     const newCartDrink = {
       drink: data,
@@ -48,7 +43,7 @@ export default function ProductCard({ data }) {
       >
         <div className="relative">
           <img className="w-full aspect-square" src={data.picture} />
-          <AddToFavovite />
+          {!!user && !!token && <AddToFavovite productId={data.id} />}
         </div>
         <div
           className="p-3 flex flex-col gap-2 "

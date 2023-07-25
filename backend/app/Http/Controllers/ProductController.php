@@ -208,41 +208,44 @@ class ProductController extends Controller
                 'category_id' => $data['category_id'] ?? null,
                 'picture' => $picture,
             ]);
-            $product->recipes()->delete();
-            $product->toppings()->delete();
-            $product->drinkSizes()->delete();
-            $toppings = [];
-            $product->types()->sync(json_decode($data['types']));
+            // $product->recipes()->delete();
+            // $product->toppings()->delete();
+            // foreach ($product->drinkSizes()->get() as $drinkSize) {
+            //     $drinkSize->recipes()->delete();
+            // }
+            // $product->drinkSizes()->delete();
+            // $toppings = [];
+            // $product->types()->sync(json_decode($data['types']));
 
-            foreach (json_decode($data['toppings']) as $topping) {
-                $toppings[] = [
-                    'material_id' => $topping->material_id,
-                    'drink_id' => $product->id,
-                    'active' => $topping->active,
-                    'amount' => $topping->amount,
-                ];
-            }
+            // foreach (json_decode($data['toppings']) as $topping) {
+            //     $toppings[] = [
+            //         'material_id' => $topping->material_id,
+            //         'drink_id' => $product->id,
+            //         'active' => $topping->active,
+            //         'amount' => $topping->amount,
+            //     ];
+            // }
 
-            Topping::insertOrIgnore($toppings);
-            $sizes = json_decode($data['sizes']);
-            foreach ($sizes as $size) {
-                $newDrinkSize = [
-                    'drink_id' => $product->id,
-                    'size_id' => $size->size_id,
-                    'active' => $size->active,
-                    'price_up_percent' => $size->price_up_percent,
-                ];
-                $insertedSize = DrinkSize::create($newDrinkSize);
-                $recipes = [];
-                foreach ($size->materials as $material) {
-                    $recipes[] = [
-                        'drink_size_id' => $insertedSize->id,
-                        'material_id' => $material->material_id,
-                        'amount' => $material->amount,
-                    ];
-                }
-                Recipe::insertOrIgnore($recipes);
-            }
+            // Topping::insertOrIgnore($toppings);
+            // $sizes = json_decode($data['sizes']);
+            // foreach ($sizes as $size) {
+            //     $newDrinkSize = [
+            //         'drink_id' => $product->id,
+            //         'size_id' => $size->size_id,
+            //         'active' => $size->active,
+            //         'price_up_percent' => $size->price_up_percent,
+            //     ];
+            //     $insertedSize = DrinkSize::create($newDrinkSize);
+            //     $recipes = [];
+            //     foreach ($size->materials as $material) {
+            //         $recipes[] = [
+            //             'drink_size_id' => $insertedSize->id,
+            //             'material_id' => $material->material_id,
+            //             'amount' => $material->amount,
+            //         ];
+            //     }
+            //     Recipe::insertOrIgnore($recipes);
+            // }
             DB::commit();
             return redirect('dashboard/products')->with('message', __('Product update successfully'));
         } catch (Exception $e) {
@@ -259,12 +262,23 @@ class ProductController extends Controller
         //
     }
 
-    public function getDrinks()
+    public function getDrinks(Request $request)
     {
-        $products = Product::query()->whereHas('types', fn ($q) => $q->where('type', 'drink'))
-            ->with(['category', 'uom', 'tax', 'sizes', 'availableToppings', 'tax', 'recipes', 'promotions' => function ($query) {
-                $query->where('from_time', '<=', date("Y-m-d H:i:s"))->where('to_time', '>', date("Y-m-d H:i:s"));
-            }])->where('active', true)->get();
+        $products = [];
+        if ($request->has('category_slug')) {
+            $categories = Category::where('slug', $request->category_slug)->first();
+            if (!$categories) return $this->errorResponse(['message' => 'Category not found !']);
+            $allChildrenIds = array_merge([$categories->id], $categories->getAllChildrenIds());
+
+            $products = Product::query()->whereIn('category_id', $allChildrenIds)->whereHas('types', fn ($q) => $q->where('type', 'drink'))
+                ->with(['category', 'uom', 'tax', 'sizes', 'availableToppings', 'tax', 'recipes', 'promotions' => function ($query) {
+                    $query->where('from_time', '<=', date("Y-m-d H:i:s"))->where('to_time', '>', date("Y-m-d H:i:s"));
+                }])->where('active', true)->get();
+        } else
+            $products = Product::query()->whereHas('types', fn ($q) => $q->where('type', 'drink'))
+                ->with(['category', 'uom', 'tax', 'sizes', 'availableToppings', 'tax', 'recipes', 'promotions' => function ($query) {
+                    $query->where('from_time', '<=', date("Y-m-d H:i:s"))->where('to_time', '>', date("Y-m-d H:i:s"));
+                }])->where('active', true)->get();
         // $products->each->append('currentExportPrice');
         return $this->successCollectionResponse(new ProductCollection($products));
     }

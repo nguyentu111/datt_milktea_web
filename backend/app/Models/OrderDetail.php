@@ -14,9 +14,9 @@ class OrderDetail extends Model
         'order_id',
         'regular_amount',
         'promotion_amount',
+        'amount'
     ];
 
-    public $timestamps = false;
     public function toppings()
     {
         return $this->belongsToMany(Topping::class, 'order_toppings', 'order_detail_id', 'topping_id');

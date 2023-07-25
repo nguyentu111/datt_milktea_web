@@ -1,5 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { axiosClient } from "../utils/request";
+import { createSlice } from "@reduxjs/toolkit";
 import { useDispatch } from "react-redux";
 
 const initialState = {

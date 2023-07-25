@@ -83,7 +83,7 @@ flatpickr(".datepicker", {
     },
 });
 
-$("input.decimal-only").on("keydown", function (event) {
+$("input.decimal-only").on("input", function (event) {
     if (event.shiftKey == true) {
         event.preventDefault();
     }
@@ -95,7 +95,8 @@ $("input.decimal-only").on("keydown", function (event) {
         event.keyCode == 37 ||
         event.keyCode == 39 ||
         event.keyCode == 46 ||
-        event.keyCode == 190
+        event.keyCode == 190 ||
+        event.keyCode == 188
     ) {
     } else {
         event.preventDefault();
@@ -103,14 +104,15 @@ $("input.decimal-only").on("keydown", function (event) {
     if ($(this).val().indexOf(".") !== -1 && event.keyCode == 190)
         event.preventDefault();
 });
-$("input.moneyformat").on("keyup", function (event) {
-    // skip for arrow keys
-    if (event.which >= 37 && event.which <= 40) return;
-    // format number
-    $(this).val(function (index, value) {
-        const rs = value
-            .replace(/\D/g, "")
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        return rs;
-    });
-});
+// $("input.moneyformat").on("keyup", function (event) {
+//     // skip for arrow keys
+//     if (event.which >= 37 && event.which <= 40 && event.keyCode == 188) return;
+//     // format number
+//     // $(this).val(function (index, value) {
+//     //     const rs = value
+//     //         .replace(/\D/g, "")
+//     //         .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+//     //     return rs;
+//     // });
+
+// });

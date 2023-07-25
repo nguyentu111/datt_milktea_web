@@ -1,11 +1,1 @@
-[
-	size_id: 2,
-	active : true,
-	price_up_percent : 1.12,
-	materials: [
-		{
-			material_id: 1,
-			amount : 12
-		}
-	]
-]
+select p.*,sum(amount) from products p JOIN (select drink_id, amount from drink_sizes ds JOIN (select sum(amount) as amount, drink_size_id from order_details  GROUP by drink_size_id ORDER by  amount desc ) temp on ds.id = temp.drink_size_id) temp2 where p.id = drink_id GROUP BY p.id;

@@ -23,6 +23,21 @@ class Category extends Model
     {
         return $this->hasMany(Category::class, 'parent_id', 'id');
     }
+    public function descendants()
+    {
+        return $this->childrenCategory()->with('descendants');
+    }
+
+    public function getAllChildrenIds()
+    {
+        $childrenIds = $this->childrenCategory->pluck('id')->toArray();
+
+        foreach ($this->childrenCategory as $child) {
+            $childrenIds = array_merge($childrenIds, $child->getAllChildrenIds());
+        }
+
+        return $childrenIds;
+    }
     public function sluggable(): array
     {
         return [
